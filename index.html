@@ -1,235 +1,832 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Pesquisa Trabalho de Matemática — Super Herói</title>
-  <meta
-    name="description"
-    content="Pesquisa Trabalho de Matemática: Super Herói. Portal interativo de investigação matemática, números primos e física dos super-heróis."
-  />
-  <link rel="stylesheet" href="./index.css" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pesquisa Trabalho de Matematica - Super heroi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Pirata+One&family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #0a0a0f;
+    font-family: 'Cinzel', serif;
+    user-select: none;
+  }
+
+  /* cursor personalizado em todo o site */
+  body, .botao {
+    cursor: url("data:image/svg+xml;utf8,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='36'%20height='36'%3E%3Ctext%20y='29'%20font-size='29'%3E🦸%3C/text%3E%3C/svg%3E") 6 6, auto;
+  }
+
+  .tela {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* ============ TELA -1: CELULAR OU COMPUTADOR ============ */
+  #telaDispositivo {
+    background: #0a0a0f;
+    z-index: 45;
+    gap: 38px;
+    padding: 0 20px;
+  }
+  #perguntaDispositivo {
+    font-family: 'Bangers', cursive;
+    font-size: clamp(1.4rem, 4vw, 2.6rem);
+    color: #e8e6e3;
+    letter-spacing: 2px;
+    text-align: center;
+    text-shadow: 3px 3px 0 #000;
+  }
+  #opcoesDispositivo {
+    display: flex;
+    gap: 22px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  /* ============ TELA 0: TOQUE PARA COMEÇAR ============ */
+  #telaToque {
+    background: #0a0a0f;
+    z-index: 40;
+  }
+  #telaToque p {
+    color: #8a8a9a;
+    font-family: 'Bangers', cursive;
+    font-size: clamp(1.2rem, 3vw, 2rem);
+    letter-spacing: 4px;
+    animation: pulsar 1.6s ease-in-out infinite;
+  }
+  @keyframes pulsar {
+    0%, 100% { opacity: 0.35; transform: scale(1); }
+    50%      { opacity: 1;    transform: scale(1.06); }
+  }
+
+  /* ============ TELA 1: SPLASH (estilo Zombie Tsunami) ============ */
+  #telaSplash {
+    background: radial-gradient(circle at center, #1a1a2e 0%, #0a0a0f 70%);
+    z-index: 30;
+    display: none;
+  }
+  #tituloSplash {
+    font-family: 'Bangers', cursive;
+    font-size: clamp(2.5rem, 9vw, 7rem);
+    color: #f2f2f2;
+    text-align: center;
+    line-height: 1.05;
+    transform: rotate(-8deg) scale(14);
+    opacity: 0;
+    text-shadow:
+      4px 4px 0 #8b0000,
+      8px 8px 0 #300000,
+      0 0 40px rgba(139, 0, 0, 0.6);
+    -webkit-text-stroke: 2px #000;
+  }
+  #tituloSplash.entrar {
+    animation: slamDiagonal 0.55s cubic-bezier(0.15, 0.9, 0.3, 1.4) forwards;
+  }
+  @keyframes slamDiagonal {
+    0%   { transform: rotate(-25deg) scale(14) translate(-40vw, -40vh); opacity: 0; }
+    60%  { transform: rotate(-8deg)  scale(1.15); opacity: 1; }
+    80%  { transform: rotate(-8deg)  scale(0.95); }
+    100% { transform: rotate(-8deg)  scale(1);    opacity: 1; }
+  }
+  #telaSplash.tremer { animation: tremer 0.4s linear; }
+  @keyframes tremer {
+    0%, 100% { transform: translate(0, 0); }
+    15% { transform: translate(-12px, 8px); }
+    30% { transform: translate(10px, -10px); }
+    45% { transform: translate(-8px, -6px); }
+    60% { transform: translate(8px, 6px); }
+    75% { transform: translate(-5px, 4px); }
+    90% { transform: translate(3px, -3px); }
+  }
+  #flash {
+    position: fixed;
+    inset: 0;
+    background: #fff;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 60;
+  }
+  #flash.piscar { animation: piscar 0.5s ease-out forwards; }
+  @keyframes piscar {
+    0% { opacity: 0.9; }
+    100% { opacity: 0; }
+  }
+  #telaSplash.sair { animation: desvanecer 0.8s ease forwards; }
+  @keyframes desvanecer {
+    to { opacity: 0; visibility: hidden; }
+  }
+  #dicaSplash {
+    position: absolute;
+    bottom: 12%;
+    font-family: 'Bangers', cursive;
+    font-size: clamp(1rem, 2.5vw, 1.6rem);
+    color: #8a8a9a;
+    letter-spacing: 4px;
+    opacity: 0;
+  }
+  #dicaSplash.mostrar { animation: pulsar 1.6s ease-in-out infinite; }
+
+  /* partículas esguichando no impacto (estilo Silksong) */
+  .particulaImpacto {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    opacity: 0;
+    pointer-events: none;
+    will-change: transform, opacity;
+    font-family: 'Bangers', cursive;
+    color: #ffd700;
+    text-shadow: 2px 2px 0 #000, 0 0 10px rgba(163,0,0,0.8);
+    animation: esguichar 1.1s cubic-bezier(0.15, 0.7, 0.35, 1) forwards;
+  }
+  @keyframes esguichar {
+    0%   { transform: translate(-50%, -50%) rotate(0deg) scale(0.2); opacity: 0; }
+    12%  { opacity: 1; }
+    55%  { transform: translate(calc(-50% + var(--dx) * 0.85), calc(-50% + var(--dy) * 0.85 - 25px)) rotate(calc(var(--rot) * 0.7)) scale(1.15); opacity: 1; }
+    100% { transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy) + 110px)) rotate(var(--rot)) scale(0.8); opacity: 0; }
+  }
+
+  /* ============ SPLASH 2: ao clicar em INICIAR ============ */
+  #telaSplash2 {
+    background: radial-gradient(circle at center, #1a1a2e 0%, #0a0a0f 70%);
+    z-index: 28;
+    display: none;
+  }
+  #tituloSplash2 {
+    font-family: 'Bangers', cursive;
+    font-size: clamp(1.8rem, 7vw, 5rem);
+    color: #f2f2f2;
+    text-align: center;
+    line-height: 1.05;
+    max-width: 92vw;
+    transform: rotate(-8deg) scale(14);
+    opacity: 0;
+    text-shadow: 4px 4px 0 #8b0000, 8px 8px 0 #300000, 0 0 40px rgba(139, 0, 0, 0.6);
+    -webkit-text-stroke: 2px #000;
+  }
+  #tituloSplash2.entrar { animation: slamDiagonal 0.55s cubic-bezier(0.15, 0.9, 0.3, 1.4) forwards; }
+  #telaSplash2.tremer { animation: tremer 0.4s linear; }
+  #telaSplash2.sair { animation: desvanecer 0.8s ease forwards; }
+  #dicaSplash2 {
+    position: absolute;
+    bottom: 12%;
+    font-family: 'Bangers', cursive;
+    font-size: clamp(1rem, 2.5vw, 1.6rem);
+    color: #8a8a9a;
+    letter-spacing: 4px;
+    opacity: 0;
+  }
+  #dicaSplash2.mostrar { animation: pulsar 1.6s ease-in-out infinite; }
+
+  /* ============ TELA 2: MENU PRINCIPAL ============ */
+  #telaMenu {
+    background: linear-gradient(#0d0d14 0%, #16121c 50%, #0d0d14 100%);
+    z-index: 10;
+    display: none;
+    opacity: 0;
+  }
+  #telaMenu.aparecer {
+    display: flex;
+    animation: surgir 1s ease forwards;
+  }
+  @keyframes surgir { to { opacity: 1; } }
+  #telaMenu.sumir { animation: desvanecer 0.8s ease forwards; }
+
+  /* --- estantes passando ao fundo --- */
+  .estante {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 130px;
+    overflow: hidden;
+    opacity: 0.35;
+    pointer-events: none;
+  }
+  .estante::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 10px;
+    background: #2b1d12;
+    box-shadow: 0 -2px 8px rgba(0,0,0,0.8);
+  }
+  .estanteCima  { top: 6%; }
+  .estanteBaixo { bottom: 6%; }
+  .trilhoLivros {
+    display: flex;
+    align-items: flex-end;
+    height: 120px;
+    width: max-content;
+    gap: 3px;
+  }
+  .estanteCima .trilhoLivros  { animation: rolarEsq 40s linear infinite; }
+  .estanteBaixo .trilhoLivros { animation: rolarDir 55s linear infinite; }
+  @keyframes rolarEsq { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+  @keyframes rolarDir { from { transform: translateX(-50%); } to { transform: translateX(0); } }
+  .livro {
+    width: 26px;
+    border-radius: 3px 3px 0 0;
+    box-shadow: inset -4px 0 6px rgba(0,0,0,0.45), inset 2px 0 3px rgba(255,255,255,0.15);
+    position: relative;
+  }
+  .livro::before {
+    content: '';
+    position: absolute;
+    top: 10px;
+    left: 4px;
+    right: 4px;
+    height: 3px;
+    background: rgba(255, 215, 130, 0.5);
+    border-radius: 2px;
+  }
+  .livro.inclinado { transform: rotate(7deg); transform-origin: bottom left; margin-right: 8px; }
+
+  /* --- vinheta escura nas bordas --- */
+  .vinheta {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, transparent 45%, rgba(0,0,0,0.85) 100%);
+    pointer-events: none;
+  }
+
+  /* --- elementos e números primos passando atrás --- */
+  .flutuante {
+    position: absolute;
+    left: -90px;
+    opacity: 0.4;
+    pointer-events: none;
+    animation: atravessar linear infinite;
+  }
+  .flutuante.numPrimo {
+    font-family: 'Bangers', cursive;
+    color: #a30000;
+    text-shadow: 2px 2px 0 #000, 0 0 12px rgba(163,0,0,0.6);
+  }
+  @keyframes atravessar {
+    from { transform: translateX(0) rotate(-12deg); }
+    to   { transform: translateX(calc(100vw + 180px)) rotate(12deg); }
+  }
+
+  /* --- raios/símbolos caindo --- */
+  .pena {
+    position: absolute;
+    top: -60px;
+    font-size: 28px;
+    opacity: 0.5;
+    filter: grayscale(1) brightness(2);
+    animation: cair linear infinite;
+    pointer-events: none;
+  }
+  @keyframes cair {
+    0%   { transform: translateY(0) rotate(0deg) translateX(0); }
+    25%  { transform: translateY(28vh) rotate(60deg) translateX(40px); }
+    50%  { transform: translateY(55vh) rotate(-40deg) translateX(-30px); }
+    75%  { transform: translateY(80vh) rotate(50deg) translateX(30px); }
+    100% { transform: translateY(115vh) rotate(-30deg) translateX(-20px); }
+  }
+
+  /* --- título e subtítulo do menu --- */
+  #conteudoMenu {
+    position: relative;
+    z-index: 5;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 0 20px;
+  }
+  #tituloMenu {
+    font-family: 'Bangers', cursive;
+    font-size: clamp(1.8rem, 5.5vw, 4rem);
+    color: #e8e6e3;
+    letter-spacing: 3px;
+    text-shadow: 3px 3px 0 #000, 0 0 25px rgba(255,255,255,0.15);
+    animation: flutuar 4s ease-in-out infinite;
+  }
+  @keyframes flutuar {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-8px); }
+  }
+  #subtituloMenu {
+    font-family: 'Pirata One', cursive;
+    font-size: clamp(2.2rem, 7vw, 5.5rem);
+    color: #a30000;
+    letter-spacing: 2px;
+    text-shadow:
+      0 0 15px rgba(163, 0, 0, 0.8),
+      0 0 45px rgba(163, 0, 0, 0.45),
+      2px 2px 2px #000;
+    animation: brasa 3s ease-in-out infinite;
+  }
+  @keyframes brasa {
+    0%, 100% { text-shadow: 0 0 15px rgba(163,0,0,0.8), 0 0 45px rgba(163,0,0,0.45), 2px 2px 2px #000; }
+    50%      { text-shadow: 0 0 25px rgba(220,0,0,1),   0 0 70px rgba(220,0,0,0.6),  2px 2px 2px #000; }
+  }
+
+  /* --- botões --- */
+  #botoes {
+    margin-top: 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+  .botao {
+    font-family: 'Bangers', cursive;
+    font-size: clamp(1.3rem, 3vw, 2rem);
+    letter-spacing: 4px;
+    padding: 14px 70px;
+    border: 2px solid #6b0000;
+    border-radius: 8px;
+    background: linear-gradient(#2a0a0a, #14060a);
+    color: #e8e6e3;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+    box-shadow: 0 4px 0 #3d0000, 0 8px 18px rgba(0,0,0,0.6);
+  }
+  .botao:hover {
+    transform: translateY(-3px) scale(1.05);
+    background: linear-gradient(#4a1010, #200810);
+    box-shadow: 0 7px 0 #3d0000, 0 14px 28px rgba(163,0,0,0.35);
+    color: #fff;
+  }
+  .botao:active {
+    transform: translateY(2px) scale(0.98);
+    box-shadow: 0 2px 0 #3d0000;
+  }
+  .botaoEscolha {
+    font-size: clamp(1.1rem, 2.5vw, 1.6rem);
+    padding: 18px 50px;
+  }
+  .botaoInicio {
+    font-size: clamp(0.85rem, 1.8vw, 1.05rem);
+    letter-spacing: 3px;
+    padding: 10px 34px;
+    border-color: #3d3d4a;
+    background: linear-gradient(#1a1a22, #101016);
+    color: #a8a5a0;
+    box-shadow: 0 4px 0 #23232c, 0 8px 18px rgba(0,0,0,0.6);
+  }
+  .botaoInicio:hover {
+    border-color: #6b0000;
+    color: #fff;
+    box-shadow: 0 7px 0 #23232c, 0 14px 28px rgba(163,0,0,0.3);
+  }
+
+  /* ============ TELA SAIR (5 SEGUNDOS: OS PRIMOS NÃO DEIXARÃO!) ============ */
+  #telaSair {
+    background: radial-gradient(circle at center, #2a0808 0%, #050508 75%);
+    z-index: 50;
+    display: none;
+    padding: 0 20px;
+  }
+  #telaSair.tremer { animation: tremer 0.4s linear; }
+  #telaSair.sair { animation: desvanecer 0.6s ease forwards; }
+  #tituloSair {
+    font-family: 'Bangers', cursive;
+    font-size: clamp(2.4rem, 8.5vw, 6.5rem);
+    color: #f2f2f2;
+    text-align: center;
+    line-height: 1.05;
+    letter-spacing: 3px;
+    transform: rotate(-8deg) scale(14);
+    opacity: 0;
+    text-shadow:
+      4px 4px 0 #8b0000,
+      8px 8px 0 #300000,
+      0 0 45px rgba(220, 0, 0, 0.85);
+    -webkit-text-stroke: 2px #000;
+  }
+  #tituloSair.entrar {
+    animation: slamDiagonal 0.55s cubic-bezier(0.15, 0.9, 0.3, 1.4) forwards;
+  }
+
+  /* ============ PRÓXIMA PÁGINA (AO CLICAR EM INICIAR) ============ */
+  #telaProxima {
+    background: radial-gradient(ellipse at center, #16121c 0%, #0a0a0f 75%);
+    z-index: 20;
+    display: none;
+    opacity: 0;
+    gap: 32px;
+    padding: 0 24px;
+    text-align: center;
+  }
+  #telaProxima.aparecer {
+    display: flex;
+    animation: surgir 1s ease forwards;
+  }
+  #telaProxima.sumir { animation: desvanecer 0.6s ease forwards; }
+  #tituloProxima {
+    font-family: 'Pirata One', cursive;
+    font-size: clamp(2rem, 5.5vw, 3.8rem);
+    color: #a30000;
+    letter-spacing: 2px;
+    text-shadow: 0 0 15px rgba(163,0,0,0.8), 2px 2px 2px #000;
+    animation: brasa 3s ease-in-out infinite;
+  }
+  .avisoEmBreve {
+    font-family: 'Cinzel', serif;
+    font-weight: 700;
+    color: #8a8a9a;
+    font-size: clamp(1.1rem, 2.5vw, 1.6rem);
+  }
+
+  /* ============ VERSÃO PARA CELULAR ============ */
+  .modoCelular .estante { height: 88px; opacity: 0.22; }
+  .modoCelular .trilhoLivros { height: 78px; }
+  .modoCelular .livro { width: 18px; }
+  .modoCelular .botaoEscolha { width: min(320px, 86vw); padding: 16px 10px; font-size: 1.05rem; }
+  .modoCelular #botoes .botao { padding: 15px 60px; }
+  .modoCelular .pena { font-size: 20px; }
+  .modoCelular .botaoInicio { padding: 10px 24px; letter-spacing: 2px; }
+  .modoCelular #perguntaDispositivo { font-size: clamp(1.2rem, 6vw, 1.8rem); }
+  .modoCelular #opcoesDispositivo { flex-direction: column; width: 100%; align-items: center; }
+</style>
 </head>
 <body>
-  <!-- Cabeçalho Principal -->
-  <header class="site-header" id="main-header">
-    <a href="#inicio" class="brand-mark" id="brand-home-link" aria-label="Voltar para a tela inicial">
-      <div class="brand-prime-symbol" aria-hidden="true">ℙ</div>
-      <div class="brand-text-group">
-        <span class="brand-title">Trabalho de Matemática</span>
-        <span class="brand-subtitle">Divisão Super Herói · Números Primos</span>
-      </div>
-    </a>
 
-    <div class="header-status">
-      <div class="prime-ticker" id="header-prime-ticker" aria-live="polite">
-        Sequência Prima Ativa: <strong id="active-prime-value">2 · 3 · 5 · 7 · 11 · 13</strong>
-      </div>
-    </div>
-  </header>
-
-  <!-- Conteúdo Principal -->
-  <main class="app-main" id="app-main-content">
-    <!-- TELA 1: TELA INICIAL -->
-    <section class="screen-view" id="screen-inicio" aria-labelledby="hero-main-heading">
-      <div class="hero-layout">
-        <div class="hero-copy">
-          <p class="chapter-kicker">Apresentação Oficial · Matemática Aplicada</p>
-
-          <h1 class="hero-heading-group" id="hero-main-heading" title="Clique nas letras para repetir a animação">
-            <span class="hero-main-title" id="title-line-top" data-text="Pesquisa Trabalho de Matemática">Pesquisa Trabalho de Matemática</span>
-            <span class="hero-sub-title" id="title-line-bottom" data-text="Super Herói">Super Herói</span>
-          </h1>
-
-          <p class="hero-description" id="hero-intro-text">
-            Bem-vindo à investigação matemática sobre o universo dos Super-Heróis.
-            Explore como números primos, geometria áurea e equações físicas sustentam
-            os poderes mais extraordinários — mas cuidado: tentar abandonar a missão
-            acionará a guarda dos números primos.
-          </p>
-
-          <!-- Botões de Ação Principais: INICIAR e SAIR -->
-          <div class="hero-actions" role="group" aria-label="Ações principais da apresentação">
-            <button type="button" class="btn btn-iniciar" id="btn-iniciar">
-              <span>Iniciar</span>
-              <span class="btn-arrow" aria-hidden="true">→</span>
-            </button>
-
-            <button type="button" class="btn btn-sair" id="btn-sair">
-              <span>Sair</span>
-            </button>
-          </div>
-
-          <!-- Faixa de Fórmulas e Estatísticas -->
-          <div class="hero-formula-strip" id="hero-formula-strip">
-            <div class="formula-item">
-              <span class="formula-code">p ∈ {2, 3, 5, 7, 11, 13, 17…}</span>
-              <span class="formula-caption">Guardiões Primos Indestrutíveis</span>
-            </div>
-            <div class="formula-item">
-              <span class="formula-code">φ = (1 + √5) / 2 ≈ 1,618</span>
-              <span class="formula-caption">Proporção Áurea do Escudo</span>
-            </div>
-            <div class="formula-item">
-              <span class="formula-code" id="exit-attempts-counter">0 bloqueios</span>
-              <span class="formula-caption">Tentativas de fuga impedidas</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Ilustração / Emblema Geométrico do Super Herói -->
-        <div class="hero-visual">
-          <figure class="emblem-frame" id="hero-emblem-container">
-            <img
-              src="./assets/hero-emblem.jpg"
-              alt="Brasão geométrico Super Herói com espiral áurea e números primos 2, 3, 5, 7 e 13"
-              class="emblem-image"
-              id="hero-emblem-img"
-            />
-            <figcaption class="emblem-caption-bar">
-              <span>Escudo Áureo · Matriz Prima</span>
-              <span class="emblem-prime-sequence">ℙ = {2, 3, 5, 7, 13}</span>
-            </figcaption>
-          </figure>
-        </div>
-      </div>
-    </section>
-
-    <!-- TELA 2: PÁGINA INTERATIVA DA PESQUISA (Ao clicar em INICIAR) -->
-    <section class="screen-view" id="screen-pesquisa" aria-labelledby="stage-heading" hidden>
-      <div class="stage-container">
-        <div class="stage-top-bar">
-          <div class="stage-title-block">
-            <h2 id="stage-heading" data-text="Central da Pesquisa — Matemática dos Super-Heróis">
-              Central da Pesquisa — Matemática dos Super-Heróis
-            </h2>
-            <p id="stage-subtitle">
-              Segunda página pronta para o conteúdo do trabalho. Teste abaixo o verificador de números primos e o banco de pesquisa.
-            </p>
-          </div>
-
-          <button type="button" class="btn btn-voltar" id="btn-voltar-inicio">
-            <span aria-hidden="true">←</span>
-            <span>Voltar ao Início</span>
-          </button>
-        </div>
-
-        <div class="workspace-grid">
-          <!-- Painel Esquerdo: Laboratório de Números Primos & Superpoderes -->
-          <div class="interactive-panel" id="panel-prime-lab">
-            <h3 class="panel-heading">1. Verificador de Frequência Prima do Herói</h3>
-            <p class="panel-subtext">
-              Digite qualquer número inteiro para descobrir se ele faz parte da elite dos Números Primos que protegem este trabalho.
-            </p>
-
-            <div class="form-group">
-              <label class="form-label" for="input-prime-number">Número de Poder (Inteiro Positivo)</label>
-              <input
-                type="number"
-                id="input-prime-number"
-                class="form-input"
-                value="17"
-                min="1"
-                max="999999"
-                placeholder="Ex: 2, 3, 5, 7, 11, 13, 17..."
-              />
-            </div>
-
-            <div class="prime-verifier-box" id="prime-verifier-output" aria-live="polite">
-              <div class="prime-result-title" id="prime-result-headline">17 é um Número Primo Super-Herói!</div>
-              <p class="prime-result-detail" id="prime-result-explanation">
-                Divisível apenas por 1 e por 17. Faz parte da guarda que impede qualquer saída!
-              </p>
-            </div>
-          </div>
-
-          <!-- Painel Direito: Registro de Pesquisa (LocalStorage / Firebase Ready) -->
-          <div class="interactive-panel" id="panel-research-db">
-            <h3 class="panel-heading">2. Registro da Pesquisa de Super-Heróis</h3>
-            <p class="panel-subtext">
-              Adicione um super-herói e a fórmula matemática analisada pela equipe.
-            </p>
-
-            <form id="form-add-hero" novalidate>
-              <div class="form-group">
-                <label class="form-label" for="input-hero-name">Nome do Super-Herói</label>
-                <input
-                  type="text"
-                  id="input-hero-name"
-                  class="form-input"
-                  placeholder="Ex: Doutor Estranho"
-                  required
-                />
-              </div>
-
-              <div class="form-group">
-                <label class="form-label" for="input-hero-formula">Conceito ou Fórmula Matemática</label>
-                <input
-                  type="text"
-                  id="input-hero-formula"
-                  class="form-input"
-                  placeholder="Ex: Dimensão Fractal de Mandelbrot (z = z² + c)"
-                  required
-                />
-              </div>
-
-              <button type="submit" class="btn btn-iniciar" id="btn-salvar-pesquisa" style="width: 100%; padding: 0.85rem 1.5rem;">
-                <span>Registrar na Pesquisa</span>
-              </button>
-            </form>
-
-            <div class="submissions-list" id="research-entries-list" aria-label="Registros da pesquisa">
-              <!-- Preenchido dinamicamente pelo app.js -->
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <!-- OVERLAY DE 5 SEGUNDOS AO CLICAR EM SAIR: "OS PRIMOS NÃO DEIXARÃO!" -->
-  <div
-    class="primos-overlay"
-    id="primos-alert-overlay"
-    role="alertdialog"
-    aria-modal="true"
-    aria-labelledby="primos-alert-title"
-    aria-describedby="primos-alert-desc"
-    aria-hidden="true"
-  >
-    <div class="floating-primes-stage" id="floating-primes-stage" aria-hidden="true"></div>
-
-    <div class="primos-modal">
-      <div class="primos-prime-ring" id="primos-prime-badge">
-        ALERTA DE BLOQUEIO PRIMO · {2, 3, 5, 7, 11, 13, 17, 19, 23}
-      </div>
-
-      <h2 class="primos-message" id="primos-alert-title" data-text="OS PRIMOS NÃO DEIXARÃO!">
-        OS PRIMOS NÃO DEIXARÃO!
-      </h2>
-
-      <p class="primos-submessage" id="primos-alert-desc">
-        Saída bloqueada pela guarda matemática. Você precisa concluir a Pesquisa de Matemática — Super Herói!
-      </p>
-
-      <div class="primos-timer-track" aria-hidden="true">
-        <div class="primos-timer-fill" id="primos-timer-bar"></div>
-      </div>
-
-      <p class="primos-timer-label" id="primos-timer-countdown">
-        Retornando à missão em 5.0s...
-      </p>
+  <!-- TELA -1: celular ou computador -->
+  <div class="tela" id="telaDispositivo">
+    <h2 id="perguntaDispositivo">Você está no celular ou no computador?</h2>
+    <div id="opcoesDispositivo">
+      <button class="botao botaoEscolha" id="btnCelular">CELULAR</button>
+      <button class="botao botaoEscolha" id="btnComputador">COMPUTADOR</button>
     </div>
   </div>
 
-  <!-- Rodapé -->
-  <footer class="site-footer" id="main-footer">
-    <span>Pesquisa Trabalho de Matemática · Super Herói</span>
-    <span class="storage-status-indicator" id="firebase-status-text">
-      Armazenamento Ativo · Pronto para Firebase Hosting
-    </span>
-  </footer>
+  <!-- TELA 0: libera o áudio -->
+  <div class="tela" id="telaToque">
+    <p>TOQUE PARA COMEÇAR</p>
+  </div>
 
-  <script type="module" src="./app.js"></script>
+  <!-- TELA 1: splash com o nome na diagonal -->
+  <div class="tela" id="telaSplash">
+    <h1 id="tituloSplash">Pesquisa Trabalho de<br>Matematica</h1>
+    <p id="dicaSplash">CLIQUE PARA CONTINUAR</p>
+  </div>
+  <div id="flash"></div>
+
+  <!-- TELA 2: menu principal -->
+  <div class="tela" id="telaMenu">
+    <div class="estante estanteCima"><div class="trilhoLivros"></div></div>
+    <div class="estante estanteBaixo"><div class="trilhoLivros"></div></div>
+    <div class="vinheta"></div>
+    <div id="conteudoMenu">
+      <h2 id="tituloMenu">Pesquisa Trabalho de Matematica</h2>
+      <h1 id="subtituloMenu">Super heroi</h1>
+      <div id="botoes">
+        <button class="botao" id="btnIniciar">INICIAR</button>
+        <button class="botao" id="btnSair">SAIR</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SPLASH 2: agradecimento ao clicar em INICIAR -->
+  <div class="tela" id="telaSplash2">
+    <h1 id="tituloSplash2">Obrigado por iniciar<br>nosso trabalho!</h1>
+    <p id="dicaSplash2">CLIQUE PARA CONTINUAR</p>
+  </div>
+
+  <!-- TELA PRÓXIMA (outra página que já vamos fazer) -->
+  <div class="tela" id="telaProxima">
+    <h1 id="tituloProxima">Super heroi</h1>
+    <p class="avisoEmBreve">Em breve...</p>
+    <button class="botao botaoInicio" id="btnVoltarInicio">VOLTAR AO INÍCIO</button>
+  </div>
+
+  <!-- TELA SAIR: aparece por 5 segundos após clicar em SAIR -->
+  <div class="tela" id="telaSair">
+    <h1 id="tituloSair">OS PRIMOS NÂO DEIXARÃO!</h1>
+  </div>
+
+<script>
+// ==================== SONS (gerados por código, sem arquivos) ====================
+let ctxAudio = null;
+
+function iniciarAudio() {
+  if (!ctxAudio) {
+    ctxAudio = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  if (ctxAudio.state === 'suspended') ctxAudio.resume();
+}
+
+// Som de impacto do splash: "vush" + "BUM" grave, estilo abertura de jogo
+function somImpacto() {
+  if (!ctxAudio) return;
+  const agora = ctxAudio.currentTime;
+
+  // vush (ruído filtrado que sobe)
+  const dur = 0.5;
+  const buffer = ctxAudio.createBuffer(1, ctxAudio.sampleRate * dur, ctxAudio.sampleRate);
+  const dados = buffer.getChannelData(0);
+  for (let i = 0; i < dados.length; i++) {
+    dados[i] = (Math.random() * 2 - 1) * (i / dados.length);
+  }
+  const ruido = ctxAudio.createBufferSource();
+  ruido.buffer = buffer;
+  const filtro = ctxAudio.createBiquadFilter();
+  filtro.type = 'bandpass';
+  filtro.frequency.setValueAtTime(300, agora);
+  filtro.frequency.exponentialRampToValueAtTime(3000, agora + dur);
+  const ganhoRuido = ctxAudio.createGain();
+  ganhoRuido.gain.setValueAtTime(0.4, agora);
+  ruido.connect(filtro).connect(ganhoRuido).connect(ctxAudio.destination);
+  ruido.start(agora);
+
+  // BUM grave (no momento em que o título "bate")
+  const tImpacto = agora + 0.45;
+  const osc = ctxAudio.createOscillator();
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(150, tImpacto);
+  osc.frequency.exponentialRampToValueAtTime(35, tImpacto + 0.7);
+  const ganhoOsc = ctxAudio.createGain();
+  ganhoOsc.gain.setValueAtTime(1.0, tImpacto);
+  ganhoOsc.gain.exponentialRampToValueAtTime(0.001, tImpacto + 0.9);
+  osc.connect(ganhoOsc).connect(ctxAudio.destination);
+  osc.start(tImpacto);
+  osc.stop(tImpacto + 1);
+
+  // estrondo (ruído grave junto com o BUM)
+  const buffer2 = ctxAudio.createBuffer(1, ctxAudio.sampleRate * 0.6, ctxAudio.sampleRate);
+  const dados2 = buffer2.getChannelData(0);
+  for (let i = 0; i < dados2.length; i++) {
+    dados2[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / dados2.length, 2);
+  }
+  const estrondo = ctxAudio.createBufferSource();
+  estrondo.buffer = buffer2;
+  const filtroGrave = ctxAudio.createBiquadFilter();
+  filtroGrave.type = 'lowpass';
+  filtroGrave.frequency.value = 200;
+  const ganhoEstrondo = ctxAudio.createGain();
+  ganhoEstrondo.gain.value = 0.8;
+  estrondo.connect(filtroGrave).connect(ganhoEstrondo).connect(ctxAudio.destination);
+  estrondo.start(tImpacto);
+}
+
+// clique de botão
+function somClique() {
+  if (!ctxAudio) return;
+  const agora = ctxAudio.currentTime;
+  const osc = ctxAudio.createOscillator();
+  osc.type = 'square';
+  osc.frequency.setValueAtTime(600, agora);
+  osc.frequency.exponentialRampToValueAtTime(200, agora + 0.12);
+  const ganho = ctxAudio.createGain();
+  ganho.gain.setValueAtTime(0.15, agora);
+  ganho.gain.exponentialRampToValueAtTime(0.001, agora + 0.15);
+  osc.connect(ganho).connect(ctxAudio.destination);
+  osc.start(agora);
+  osc.stop(agora + 0.15);
+}
+
+// tique sutil ao passar o mouse
+function somHover() {
+  if (!ctxAudio) return;
+  const agora = ctxAudio.currentTime;
+  const osc = ctxAudio.createOscillator();
+  osc.type = 'sine';
+  osc.frequency.value = 900;
+  const ganho = ctxAudio.createGain();
+  ganho.gain.setValueAtTime(0.05, agora);
+  ganho.gain.exponentialRampToValueAtTime(0.001, agora + 0.06);
+  osc.connect(ganho).connect(ctxAudio.destination);
+  osc.start(agora);
+  osc.stop(agora + 0.06);
+}
+
+// ==================== LIVROS DA ESTANTE ====================
+const coresLivros = ['#5c2a2a', '#2a3a5c', '#3d5c2a', '#5c4a2a', '#4a2a5c', '#2a5c55', '#6b3320', '#40404f'];
+
+function criarLivros(trilho) {
+  const conjunto = [];
+  for (let i = 0; i < 45; i++) {
+    const altura = 60 + Math.floor(Math.random() * 55);
+    const cor = coresLivros[Math.floor(Math.random() * coresLivros.length)];
+    const inclinado = Math.random() < 0.12 ? ' inclinado' : '';
+    conjunto.push(`<div class="livro${inclinado}" style="height:${altura}px;background:${cor}"></div>`);
+  }
+  trilho.innerHTML = conjunto.join('') + conjunto.join('');
+}
+
+document.querySelectorAll('.trilhoLivros').forEach(criarLivros);
+
+// ==================== FUNDO ANIMADO (heróis, números primos e símbolos) ====================
+const telaMenu = document.getElementById('telaMenu');
+
+function povoarFundo(tela) {
+  const itensFlutuantes = [];
+  for (let i = 0; i < 10; i++) itensFlutuantes.push('🦸');
+  for (let i = 0; i < 7; i++)  itensFlutuantes.push('🛡️');
+  for (let i = 0; i < 7; i++)  itensFlutuantes.push('📐');
+  for (const primo of ['2', '3', '5', '7', '11', '13', '17', '23']) {
+    itensFlutuantes.push(primo);
+  }
+  for (const escolha of itensFlutuantes) {
+    const item = document.createElement('div');
+    const ehNumero = /^[0-9]+$/.test(escolha);
+    item.className = ehNumero ? 'flutuante numPrimo' : 'flutuante';
+    item.textContent = escolha;
+    item.style.top = (8 + Math.random() * 76) + '%';
+    item.style.fontSize = (18 + Math.random() * 28) + 'px';
+    item.style.animationDuration = (12 + Math.random() * 20) + 's';
+    item.style.animationDelay = (-Math.random() * 30) + 's';
+    tela.appendChild(item);
+  }
+  for (let i = 0; i < 6; i++) {
+    const pena = document.createElement('div');
+    pena.className = 'pena';
+    pena.textContent = '⚡';
+    pena.style.left = (5 + Math.random() * 90) + '%';
+    pena.style.animationDuration = (9 + Math.random() * 8) + 's';
+    pena.style.animationDelay = (Math.random() * 10) + 's';
+    tela.appendChild(pena);
+  }
+}
+povoarFundo(telaMenu);
+
+// ==================== CELULAR OU COMPUTADOR ====================
+let particulasPorSplash = 28;
+
+const telaDispositivo = document.getElementById('telaDispositivo');
+
+function escolherDispositivo(ehCelular) {
+  iniciarAudio();
+  somClique();
+  if (ehCelular) {
+    document.documentElement.classList.add('modoCelular');
+    particulasPorSplash = 16;
+    document.querySelectorAll('.flutuante').forEach((el, i) => { if (i % 2 === 1) el.remove(); });
+    document.querySelectorAll('.pena').forEach((el, i) => { if (i % 2 === 1) el.remove(); });
+  }
+  telaDispositivo.style.display = 'none';
+}
+
+document.getElementById('btnCelular').addEventListener('click', () => escolherDispositivo(true));
+document.getElementById('btnComputador').addEventListener('click', () => escolherDispositivo(false));
+document.querySelectorAll('#opcoesDispositivo .botao').forEach(b => b.addEventListener('mouseenter', somHover));
+
+// ==================== PARTÍCULAS ESGUICHANDO NO IMPACTO ====================
+const itensImpacto = ['🦸', '⚡', '2', '3', '5', '7', '11', '13', '17', '23'];
+
+function esguicharParticulas(tela, quantidade = particulasPorSplash) {
+  for (let i = 0; i < quantidade; i++) {
+    const part = document.createElement('div');
+    part.className = 'particulaImpacto';
+    part.textContent = itensImpacto[Math.floor(Math.random() * itensImpacto.length)];
+    const angulo = Math.random() * Math.PI * 2;
+    const distancia = 110 + Math.random() * 400;
+    part.style.setProperty('--dx', Math.cos(angulo) * distancia + 'px');
+    part.style.setProperty('--dy', Math.sin(angulo) * distancia + 'px');
+    part.style.setProperty('--rot', (Math.random() * 900 - 450) + 'deg');
+    part.style.fontSize = (16 + Math.random() * 28) + 'px';
+    part.style.animationDelay = (Math.random() * 0.18) + 's';
+    part.style.animationDuration = (0.9 + Math.random() * 0.7) + 's';
+    tela.appendChild(part);
+    setTimeout(() => part.remove(), 2200);
+  }
+}
+
+// ==================== FLUXO DAS TELAS ====================
+const telaToque = document.getElementById('telaToque');
+const telaSplash = document.getElementById('telaSplash');
+const tituloSplash = document.getElementById('tituloSplash');
+const dicaSplash = document.getElementById('dicaSplash');
+const flash = document.getElementById('flash');
+const telaSplash2 = document.getElementById('telaSplash2');
+const tituloSplash2 = document.getElementById('tituloSplash2');
+const dicaSplash2 = document.getElementById('dicaSplash2');
+const telaProxima = document.getElementById('telaProxima');
+const btnVoltarInicio = document.getElementById('btnVoltarInicio');
+
+telaToque.addEventListener('click', () => {
+  iniciarAudio();
+  telaToque.style.display = 'none';
+  telaSplash.style.display = 'flex';
+
+  somImpacto();
+  tituloSplash.classList.add('entrar');
+
+  setTimeout(() => {
+    flash.classList.add('piscar');
+    telaSplash.classList.add('tremer');
+    esguicharParticulas(telaSplash);
+  }, 400);
+
+  setTimeout(() => {
+    dicaSplash.classList.add('mostrar');
+    telaSplash.addEventListener('click', () => {
+      somClique();
+      telaSplash.classList.add('sair');
+      telaMenu.classList.add('aparecer');
+    }, { once: true });
+  }, 1300);
+}, { once: true });
+
+// splash ao clicar em INICIAR
+function mostrarSplash2() {
+  telaSplash2.classList.remove('tremer', 'sair');
+  dicaSplash2.classList.remove('mostrar');
+  tituloSplash2.classList.remove('entrar');
+  telaSplash2.style.display = 'flex';
+  void tituloSplash2.offsetWidth;
+  tituloSplash2.classList.add('entrar');
+  somImpacto();
+  setTimeout(() => {
+    flash.classList.remove('piscar');
+    void flash.offsetWidth;
+    flash.classList.add('piscar');
+    telaSplash2.classList.add('tremer');
+    esguicharParticulas(telaSplash2);
+  }, 400);
+  setTimeout(() => {
+    dicaSplash2.classList.add('mostrar');
+    telaSplash2.addEventListener('click', () => {
+      somClique();
+      telaSplash2.classList.add('sair');
+      telaProxima.classList.remove('sumir');
+      telaProxima.classList.add('aparecer');
+    }, { once: true });
+  }, 1300);
+}
+
+// ==================== BOTÕES DO MENU ====================
+const btnIniciar = document.getElementById('btnIniciar');
+const btnSair = document.getElementById('btnSair');
+const telaSair = document.getElementById('telaSair');
+const tituloSair = document.getElementById('tituloSair');
+
+[btnIniciar, btnSair, btnVoltarInicio].forEach(b => {
+  b.addEventListener('mouseenter', somHover);
+});
+
+btnIniciar.addEventListener('click', () => {
+  somClique();
+  telaMenu.classList.add('sumir');
+  setTimeout(() => {
+    telaMenu.style.display = 'none';
+    mostrarSplash2();
+  }, 800);
+});
+
+btnVoltarInicio.addEventListener('click', () => {
+  somClique();
+  telaProxima.classList.add('sumir');
+  setTimeout(() => {
+    telaProxima.classList.remove('aparecer', 'sumir');
+    telaSplash2.classList.remove('tremer', 'sair');
+    telaSplash2.style.display = 'none';
+    telaMenu.style.display = '';
+    telaMenu.classList.remove('sumir');
+    telaMenu.classList.add('aparecer');
+  }, 500);
+});
+
+// Ao clicar em SAIR: aparece por 5 segundos "OS PRIMOS NÂO DEIXARÃO!"
+let timerSair = null;
+
+btnSair.addEventListener('click', () => {
+  somClique();
+  if (timerSair) clearTimeout(timerSair);
+
+  telaSair.classList.remove('tremer', 'sair');
+  tituloSair.classList.remove('entrar');
+  telaSair.style.display = 'flex';
+  void tituloSair.offsetWidth;
+  tituloSair.classList.add('entrar');
+  somImpacto();
+
+  setTimeout(() => {
+    flash.classList.remove('piscar');
+    void flash.offsetWidth;
+    flash.classList.add('piscar');
+    telaSair.classList.add('tremer');
+    esguicharParticulas(telaSair);
+  }, 400);
+
+  // Após 5 segundos (5000ms), fecha a tela de bloqueio e volta ao menu
+  timerSair = setTimeout(() => {
+    telaSair.classList.add('sair');
+    setTimeout(() => {
+      telaSair.style.display = 'none';
+      telaSair.classList.remove('tremer', 'sair');
+      tituloSair.classList.remove('entrar');
+    }, 600);
+  }, 5000);
+});
+</script>
 </body>
 </html>

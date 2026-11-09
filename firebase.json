@@ -5,18 +5,14 @@
       "firebase.json",
       ".firebaserc",
       "**/.*",
+      "**/.*/**",
       "**/node_modules/**"
     ],
-    "cleanUrls": true,
-    "trailingSlash": false,
     "headers": [
       {
-        "source": "**/*.@(jpg|jpeg|gif|png|svg|webp)",
+        "source": "**",
         "headers": [
-          {
-            "key": "Cache-Control",
-            "value": "max-age=86400"
-          }
+          { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }
         ]
       }
     ]
