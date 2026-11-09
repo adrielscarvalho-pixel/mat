@@ -1523,6 +1523,16 @@ const dadosGraficos = {
       { nome: 'Feminino',  rotulo: 'feminino',                          votos: 43, cor: '#b31217' },
       { nome: 'Outro',     rotulo: 'Se indentifica com outro genero',   votos: 8,  cor: '#7b2cbf' }
     ]
+  },
+  p7: {
+    tipo: 'pizza',
+    opcoes: [
+      { nome: '0-20',   rotulo: '0-20',   votos: 57, cor: '#b31217' },
+      { nome: '21-40',  rotulo: '21-40',  votos: 40, cor: '#1e4db7' },
+      { nome: '40-60',  rotulo: '40-60',  votos: 8,  cor: '#2e8b57', fatorRaio: 0.58 },
+      { nome: '60-80',  rotulo: '60-80',  votos: 3,  cor: '#d4a856', fatorRaio: 0.84 },
+      { nome: '80-100', rotulo: '80-100', votos: 0,  cor: '#7b2cbf' }
+    ]
   }
 };
 
@@ -1613,7 +1623,8 @@ function renderizarGraficoPizza(opcoes) {
     grupoFatias.appendChild(path);
 
     const anguloMeio = anguloInicio + anguloFatia / 2;
-    const raioTexto = fracao < 0.06 ? raio * 0.8 : (fracao < 0.14 ? raio * 0.72 : raio * 0.56);
+    const fatorR = item.fatorRaio || (fracao < 0.06 ? 0.8 : (fracao < 0.14 ? 0.72 : 0.56));
+    const raioTexto = raio * fatorR;
     const tx = Math.cos(anguloMeio) * raioTexto;
     const ty = Math.sin(anguloMeio) * raioTexto;
 
