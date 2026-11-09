@@ -627,10 +627,11 @@ document.querySelectorAll('.trilhoLivros').forEach(criarLivros);
 const telaMenu = document.getElementById('telaMenu');
 
 function povoarFundo(tela) {
+  const svgGraficoPizza = `<svg viewBox="0 0 40 40" width="1.15em" height="1.15em" style="display:block;filter:drop-shadow(2px 2px 2px rgba(0,0,0,0.85));"><circle cx="19" cy="21" r="15" fill="#2a3a5c" stroke="#000" stroke-width="1.5"/><path d="M19,21 L19,6 A15,15 0 0,1 33.5,24.8 Z" fill="#d4a856" stroke="#000" stroke-width="1.5"/><path d="M19,21 L33.5,24.8 A15,15 0 0,1 10.2,33.1 Z" fill="#3d5c2a" stroke="#000" stroke-width="1.5"/><path d="M21,19 L21,4 A15,15 0 0,0 7.2,13.2 Z" fill="#a30000" stroke="#000" stroke-width="1.5"/></svg>`;
   const itensFlutuantes = [];
   for (let i = 0; i < 14; i++) itensFlutuantes.push('🥔');
   for (let i = 0; i < 7; i++)  itensFlutuantes.push('🦸');
-  for (let i = 0; i < 7; i++)  itensFlutuantes.push('📐');
+  for (let i = 0; i < 7; i++)  itensFlutuantes.push('pizza');
   for (const primo of ['2', '3', '5', '7', '11', '13', '17', '23']) {
     itensFlutuantes.push(primo);
   }
@@ -638,7 +639,11 @@ function povoarFundo(tela) {
     const item = document.createElement('div');
     const ehNumero = /^[0-9]+$/.test(escolha);
     item.className = ehNumero ? 'flutuante numPrimo' : 'flutuante';
-    item.textContent = escolha;
+    if (escolha === 'pizza') {
+      item.innerHTML = svgGraficoPizza;
+    } else {
+      item.textContent = escolha;
+    }
     item.style.top = (8 + Math.random() * 76) + '%';
     item.style.fontSize = (18 + Math.random() * 28) + 'px';
     item.style.animationDuration = (12 + Math.random() * 20) + 's';
