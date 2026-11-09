@@ -628,8 +628,8 @@ const telaMenu = document.getElementById('telaMenu');
 
 function povoarFundo(tela) {
   const itensFlutuantes = [];
-  for (let i = 0; i < 10; i++) itensFlutuantes.push('🦸');
-  for (let i = 0; i < 7; i++)  itensFlutuantes.push('🛡️');
+  for (let i = 0; i < 14; i++) itensFlutuantes.push('🥔');
+  for (let i = 0; i < 7; i++)  itensFlutuantes.push('🦸');
   for (let i = 0; i < 7; i++)  itensFlutuantes.push('📐');
   for (const primo of ['2', '3', '5', '7', '11', '13', '17', '23']) {
     itensFlutuantes.push(primo);
@@ -678,20 +678,18 @@ document.getElementById('btnCelular').addEventListener('click', () => escolherDi
 document.getElementById('btnComputador').addEventListener('click', () => escolherDispositivo(false));
 document.querySelectorAll('#opcoesDispositivo .botao').forEach(b => b.addEventListener('mouseenter', somHover));
 
-// ==================== PARTÍCULAS ESGUICHANDO NO IMPACTO ====================
-const itensImpacto = ['🦸', '⚡', '2', '3', '5', '7', '11', '13', '17', '23'];
-
+// ==================== BATATAS ESGUICHANDO NO IMPACTO ====================
 function esguicharParticulas(tela, quantidade = particulasPorSplash) {
   for (let i = 0; i < quantidade; i++) {
     const part = document.createElement('div');
     part.className = 'particulaImpacto';
-    part.textContent = itensImpacto[Math.floor(Math.random() * itensImpacto.length)];
+    part.textContent = '🥔';
     const angulo = Math.random() * Math.PI * 2;
     const distancia = 110 + Math.random() * 400;
     part.style.setProperty('--dx', Math.cos(angulo) * distancia + 'px');
     part.style.setProperty('--dy', Math.sin(angulo) * distancia + 'px');
     part.style.setProperty('--rot', (Math.random() * 900 - 450) + 'deg');
-    part.style.fontSize = (16 + Math.random() * 28) + 'px';
+    part.style.fontSize = (14 + Math.random() * 26) + 'px';
     part.style.animationDelay = (Math.random() * 0.18) + 's';
     part.style.animationDuration = (0.9 + Math.random() * 0.7) + 's';
     tela.appendChild(part);
