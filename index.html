@@ -815,6 +815,130 @@
     height: 6px;
     background: #d4a856;
   }
+  .quadroBarrasV {
+    width: 100%;
+    max-width: 620px;
+    background: rgba(20, 14, 24, 0.86);
+    border: 1px solid rgba(163, 0, 0, 0.55);
+    border-radius: 8px;
+    padding: 28px 22px 20px;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(163, 0, 0, 0.14);
+    animation: surgirQuadroBarras 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+  .containerPlotagemV {
+    display: flex;
+    align-items: flex-start;
+    width: 100%;
+  }
+  .eixoYBarrasV {
+    position: relative;
+    width: 36px;
+    height: 250px;
+    flex-shrink: 0;
+    margin-right: 8px;
+  }
+  .marcaEixoY {
+    position: absolute;
+    right: 6px;
+    transform: translateY(50%);
+    font-family: 'Cinzel', serif;
+    font-weight: 700;
+    font-size: clamp(0.75rem, 1.8vw, 0.92rem);
+    color: #f5e6c8;
+    user-select: none;
+  }
+  .marcaEixoY::after {
+    content: '';
+    position: absolute;
+    right: -8px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 6px;
+    height: 2px;
+    background: #d4a856;
+  }
+  .areaColunasV {
+    position: relative;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+  .zonaBarrasV {
+    position: relative;
+    width: 100%;
+    height: 250px;
+    border-left: 2px solid rgba(212, 168, 86, 0.7);
+    border-bottom: 2px solid rgba(212, 168, 86, 0.7);
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-around;
+    padding: 0 6px;
+    gap: 8px;
+  }
+  .gradeHorizontalV {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+  }
+  .linhaGradeH {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 0;
+    border-top: 1px dashed rgba(212, 168, 86, 0.22);
+  }
+  .colunaBarraV {
+    position: relative;
+    z-index: 2;
+    flex: 1;
+    max-width: 72px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+  }
+  .valorTopoBarraV {
+    font-family: 'Cinzel', serif;
+    font-weight: 900;
+    font-size: clamp(0.72rem, 1.7vw, 0.92rem);
+    color: #d4a856;
+    text-shadow: 1px 2px 3px #000;
+    margin-bottom: 5px;
+    white-space: nowrap;
+  }
+  .preenchimentoBarraV {
+    width: 100%;
+    height: 0%;
+    border-radius: 4px 4px 0 0;
+    border: 2px solid #000;
+    border-bottom: none;
+    border-top: 2px solid rgba(255, 255, 255, 0.85);
+    box-shadow: 0 -4px 14px rgba(0, 0, 0, 0.65), inset 0 2px 0 rgba(255, 255, 255, 0.3);
+    transition: filter 0.25s ease;
+    cursor: pointer;
+  }
+  .preenchimentoBarraV:hover {
+    filter: brightness(1.18);
+  }
+  .rotulosXBarraV {
+    display: flex;
+    justify-content: space-around;
+    padding: 10px 6px 0;
+    gap: 4px;
+  }
+  .nomeColunaV {
+    flex: 1;
+    max-width: 82px;
+    text-align: center;
+    font-family: 'Bangers', cursive;
+    font-size: clamp(0.85rem, 2.1vw, 1.15rem);
+    letter-spacing: 1px;
+    color: #f2ede4;
+    text-shadow: 1px 2px 2px #000;
+  }
   #btnVoltar {
     margin-top: 36px;
     font-size: clamp(1rem, 2.2vw, 1.4rem);
@@ -1302,6 +1426,19 @@ const dadosGraficos = {
       { nome: 'Homem de ferro',  rotulo: 'Homem de ferro',  votos: 61, cor: '#b31217' },
       { nome: 'Capitão america', rotulo: 'Capitão america', votos: 47, cor: '#1e4db7' }
     ]
+  },
+  p3: {
+    tipo: 'barras_vertical',
+    passoEscala: 10,
+    maxEscala: 40,
+    mensagemAntes: 'botamos 5 opções de vilões para as pessoas, se não ficaria muito aberto.',
+    opcoes: [
+      { nome: 'Venom',      rotulo: 'Venom',      votos: 29, cor: '#3b4d6b' },
+      { nome: 'Coringa',    rotulo: 'Coringa',    votos: 24, cor: '#2e8b57' },
+      { nome: 'Apocalipse', rotulo: 'Apocalipse', votos: 6,  cor: '#1e6b7b' },
+      { nome: 'Thanos',     rotulo: 'Thanos',     votos: 33, cor: '#7b2cbf' },
+      { nome: 'Magneto',    rotulo: 'Magneto',    votos: 16, cor: '#b31217' }
+    ]
   }
 };
 
@@ -1640,28 +1777,187 @@ function renderizarGraficoBarrasHorizontal(config) {
   return painel;
 }
 
+function renderizarGraficoBarrasVertical(config) {
+  if (idAnimacaoGrafico) cancelAnimationFrame(idAnimacaoGrafico);
+
+  const opcoes = config.opcoes;
+  const passo = config.passoEscala || 10;
+  const maiorVoto = Math.max(...opcoes.map(o => o.votos));
+  const maxEscala = config.maxEscala || (Math.ceil(maiorVoto / passo) * passo);
+
+  const painel = document.createElement('div');
+  painel.className = 'painelGrafico';
+
+  const quadro = document.createElement('div');
+  quadro.className = 'quadroBarrasV';
+
+  const containerPlotagem = document.createElement('div');
+  containerPlotagem.className = 'containerPlotagemV';
+
+  const eixoY = document.createElement('div');
+  eixoY.className = 'eixoYBarrasV';
+
+  const areaColunas = document.createElement('div');
+  areaColunas.className = 'areaColunasV';
+
+  const zonaBarras = document.createElement('div');
+  zonaBarras.className = 'zonaBarrasV';
+
+  const gradeHorizontal = document.createElement('div');
+  gradeHorizontal.className = 'gradeHorizontalV';
+  zonaBarras.appendChild(gradeHorizontal);
+
+  for (let v = 0; v <= maxEscala; v += passo) {
+    const posPorc = (v / maxEscala) * 100;
+
+    const marcaY = document.createElement('div');
+    marcaY.className = 'marcaEixoY';
+    marcaY.style.bottom = posPorc + '%';
+    marcaY.textContent = v;
+    eixoY.appendChild(marcaY);
+
+    if (v > 0) {
+      const linhaH = document.createElement('div');
+      linhaH.className = 'linhaGradeH';
+      linhaH.style.bottom = posPorc + '%';
+      gradeHorizontal.appendChild(linhaH);
+    }
+  }
+
+  const rotulosX = document.createElement('div');
+  rotulosX.className = 'rotulosXBarraV';
+
+  const barrasInfo = [];
+
+  opcoes.forEach(item => {
+    const coluna = document.createElement('div');
+    coluna.className = 'colunaBarraV';
+
+    const valorTopo = document.createElement('div');
+    valorTopo.className = 'valorTopoBarraV';
+    valorTopo.textContent = '0';
+
+    const preenchimento = document.createElement('div');
+    preenchimento.className = 'preenchimentoBarraV';
+    preenchimento.style.background = `linear-gradient(180deg, ${item.cor} 0%, ${item.cor}cc 100%)`;
+    preenchimento.addEventListener('mouseenter', somHover);
+
+    coluna.appendChild(valorTopo);
+    coluna.appendChild(preenchimento);
+    zonaBarras.appendChild(coluna);
+
+    const nomeEl = document.createElement('div');
+    nomeEl.className = 'nomeColunaV';
+    nomeEl.textContent = item.nome;
+    rotulosX.appendChild(nomeEl);
+
+    barrasInfo.push({ item, preenchimento, valorTopo });
+  });
+
+  areaColunas.appendChild(zonaBarras);
+  areaColunas.appendChild(rotulosX);
+  containerPlotagem.appendChild(eixoY);
+  containerPlotagem.appendChild(areaColunas);
+  quadro.appendChild(containerPlotagem);
+  painel.appendChild(quadro);
+
+  const { blocoNumeros, spansNumeros, totalEl } = criarBlocoNumeros(opcoes);
+  painel.appendChild(blocoNumeros);
+
+  const duracao = 1250;
+  const inicio = performance.now();
+  let ultimoTick = 0;
+
+  function animarBarrasV(agora) {
+    const t = Math.min(1, (agora - inicio) / duracao);
+    const eased = 1 - Math.pow(1 - t, 3);
+
+    if (agora - ultimoTick > 75 && t < 0.96) {
+      somTecla();
+      ultimoTick = agora;
+    }
+
+    barrasInfo.forEach(b => {
+      const votosAtuais = b.item.votos * eased;
+      const alturaPorc = Math.min(100, (votosAtuais / maxEscala) * 100);
+      b.preenchimento.style.height = alturaPorc.toFixed(2) + '%';
+      b.valorTopo.textContent = `${Math.round(votosAtuais)}`;
+    });
+
+    spansNumeros.forEach(s => {
+      const votosAtuais = Math.round(s.item.votos * eased);
+      s.textoEl.textContent = `${s.prefixo}: ${votosAtuais} pessoas`;
+    });
+
+    totalEl.textContent = `Total: ${Math.round(TOTAL_PESQUISA * eased)} pessoas`;
+
+    if (t < 1) {
+      idAnimacaoGrafico = requestAnimationFrame(animarBarrasV);
+    } else {
+      barrasInfo.forEach(b => {
+        const alturaPorc = Math.min(100, (b.item.votos / maxEscala) * 100);
+        b.preenchimento.style.height = alturaPorc.toFixed(2) + '%';
+        b.valorTopo.textContent = `${b.item.votos}`;
+      });
+      spansNumeros.forEach(s => {
+        s.textoEl.textContent = `${s.prefixo}: ${s.item.votos} pessoas`;
+      });
+      totalEl.textContent = `Total: ${TOTAL_PESQUISA} pessoas`;
+    }
+  }
+
+  idAnimacaoGrafico = requestAnimationFrame(animarBarrasV);
+  return painel;
+}
+
 // ==================== ABERTURA DE CADA PERGUNTA ====================
-function abrirPergunta(chave) {
+function exibirSecaoPergunta(chave) {
   conteudoSecao.innerHTML = '';
   tituloSecao.textContent = titulosPerguntas[chave] || '';
+  telaSecao.classList.add('aparecer');
+
+  const cfg = dadosGraficos[chave];
+  if (cfg) {
+    if (cfg.tipo === 'barras_horizontal') {
+      conteudoSecao.appendChild(renderizarGraficoBarrasHorizontal(cfg));
+    } else if (cfg.tipo === 'barras_vertical') {
+      conteudoSecao.appendChild(renderizarGraficoBarrasVertical(cfg));
+    } else {
+      conteudoSecao.appendChild(renderizarGraficoPizza(cfg.opcoes));
+    }
+  } else {
+    const aviso = document.createElement('p');
+    aviso.className = 'avisoEmBreve';
+    aviso.textContent = 'Em breve...';
+    conteudoSecao.appendChild(aviso);
+  }
+}
+
+function abrirPergunta(chave) {
+  const cfg = dadosGraficos[chave];
 
   telaProxima.classList.add('sumir');
   setTimeout(() => {
     telaProxima.classList.remove('aparecer', 'sumir');
-    telaSecao.classList.add('aparecer');
 
-    const cfg = dadosGraficos[chave];
-    if (cfg) {
-      if (cfg.tipo === 'barras_horizontal') {
-        conteudoSecao.appendChild(renderizarGraficoBarrasHorizontal(cfg));
-      } else {
-        conteudoSecao.appendChild(renderizarGraficoPizza(cfg.opcoes));
-      }
+    if (cfg && cfg.mensagemAntes) {
+      paginasAtuais = [
+        [{ texto: cfg.mensagemAntes, classe: 'linhaNormal' }]
+      ];
+      cliqueNoFim = true;
+      paginaAtual = 0;
+      aoTerminarPaginas = () => {
+        telaHistoria.classList.add('sumir');
+        setTimeout(() => {
+          telaHistoria.classList.remove('aparecer', 'sumir');
+          exibirSecaoPergunta(chave);
+        }, 500);
+      };
+      telaHistoria.classList.remove('sumir');
+      telaHistoria.classList.add('aparecer');
+      mostrarPagina(0);
     } else {
-      const aviso = document.createElement('p');
-      aviso.className = 'avisoEmBreve';
-      aviso.textContent = 'Em breve...';
-      conteudoSecao.appendChild(aviso);
+      exibirSecaoPergunta(chave);
     }
   }, 500);
 }
