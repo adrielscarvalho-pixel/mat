@@ -695,6 +695,126 @@
     color: #9e988e;
     letter-spacing: 1px;
   }
+  @keyframes surgirQuadroBarras {
+    0%   { opacity: 0; transform: translateY(22px) scale(0.92); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  .quadroBarrasH {
+    width: 100%;
+    max-width: 560px;
+    background: rgba(20, 14, 24, 0.86);
+    border: 1px solid rgba(163, 0, 0, 0.55);
+    border-radius: 8px;
+    padding: 24px 28px 18px;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(163, 0, 0, 0.14);
+    animation: surgirQuadroBarras 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+  .areaPlotagemH {
+    position: relative;
+    width: 100%;
+  }
+  .gradeVerticalH {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 34px;
+    pointer-events: none;
+    z-index: 1;
+  }
+  .linhaGradeV {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 0;
+    border-left: 1px dashed rgba(212, 168, 86, 0.22);
+  }
+  .linhaGradeV:first-child {
+    border-left: 2px solid rgba(212, 168, 86, 0.65);
+  }
+  .listaBarrasH {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 6px 0 14px;
+  }
+  .blocoBarraH {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+  }
+  .cabecalhoBarraH {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 10px;
+  }
+  .nomeBarraH {
+    font-family: 'Bangers', cursive;
+    font-size: clamp(1.15rem, 2.5vw, 1.45rem);
+    letter-spacing: 1.5px;
+    color: #f2ede4;
+    text-shadow: 1px 2px 2px #000;
+  }
+  .valorBarraH {
+    font-family: 'Cinzel', serif;
+    font-weight: 900;
+    font-size: clamp(0.9rem, 2vw, 1.1rem);
+    color: #d4a856;
+    text-shadow: 1px 1px 2px #000;
+  }
+  .trilhoBarraH {
+    position: relative;
+    width: 100%;
+    height: 36px;
+    background: rgba(10, 10, 15, 0.82);
+    border: 2px solid #000;
+    border-radius: 5px;
+    overflow: hidden;
+    box-shadow: inset 0 2px 8px rgba(0,0,0,0.85);
+  }
+  .preenchimentoBarraH {
+    height: 100%;
+    width: 0%;
+    border-radius: 3px;
+    border-right: 2px solid rgba(255, 255, 255, 0.85);
+    box-shadow: 0 0 14px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    transition: filter 0.25s ease;
+    cursor: pointer;
+  }
+  .preenchimentoBarraH:hover {
+    filter: brightness(1.18);
+  }
+  .eixoXBarrasH {
+    position: relative;
+    width: 100%;
+    height: 34px;
+    border-top: 2px solid rgba(212, 168, 86, 0.7);
+  }
+  .marcaEixoX {
+    position: absolute;
+    top: 0;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: 'Cinzel', serif;
+    font-weight: 700;
+    font-size: clamp(0.78rem, 1.8vw, 0.95rem);
+    color: #f5e6c8;
+    padding-top: 7px;
+    user-select: none;
+  }
+  .marcaEixoX::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    width: 2px;
+    height: 6px;
+    background: #d4a856;
+  }
   #btnVoltar {
     margin-top: 36px;
     font-size: clamp(1rem, 2.2vw, 1.4rem);
@@ -1163,14 +1283,26 @@ function mostrarSplash2() {
   }, 1300);
 }
 
-// ==================== DADOS E GRÁFICOS DE PIZZA (TOTAL: 108 PESSOAS) ====================
+// ==================== DADOS E GRÁFICOS (TOTAL: 108 PESSOAS) ====================
 const TOTAL_PESQUISA = 108;
 
 const dadosGraficos = {
-  p1: [
-    { nome: 'Marvel', rotulo: 'Marvel', votos: 85, cor: '#b31217' },
-    { nome: 'DC',     rotulo: 'Dc',     votos: 23, cor: '#1e4db7' }
-  ]
+  p1: {
+    tipo: 'pizza',
+    opcoes: [
+      { nome: 'Marvel', rotulo: 'Marvel', votos: 85, cor: '#b31217' },
+      { nome: 'DC',     rotulo: 'Dc',     votos: 23, cor: '#1e4db7' }
+    ]
+  },
+  p2: {
+    tipo: 'barras_horizontal',
+    passoEscala: 10,
+    maxEscala: 70,
+    opcoes: [
+      { nome: 'Homem de ferro',  rotulo: 'Homem de ferro',  votos: 61, cor: '#b31217' },
+      { nome: 'Capitão america', rotulo: 'Capitão america', votos: 47, cor: '#1e4db7' }
+    ]
+  }
 };
 
 function formatarPorcentagem(votos, total = TOTAL_PESQUISA) {
@@ -1182,6 +1314,43 @@ function formatarPorcentagem(votos, total = TOTAL_PESQUISA) {
 }
 
 let idAnimacaoGrafico = null;
+
+function criarBlocoNumeros(opcoes) {
+  const blocoNumeros = document.createElement('div');
+  blocoNumeros.className = 'numerosPesquisa';
+
+  const spansNumeros = [];
+  opcoes.forEach((item, idx) => {
+    const linha = document.createElement('div');
+    linha.className = 'linhaNumero';
+    linha.style.animationDelay = (0.3 + idx * 0.18) + 's';
+
+    const rotuloOpcao = document.createElement('span');
+    rotuloOpcao.className = 'rotuloOpcao';
+
+    const corEl = document.createElement('span');
+    corEl.className = 'corLegenda';
+    corEl.style.background = item.cor;
+
+    const textoEl = document.createElement('span');
+    const prefixo = item.rotulo || item.nome;
+    textoEl.textContent = `${prefixo}: 0 pessoas`;
+
+    rotuloOpcao.appendChild(corEl);
+    rotuloOpcao.appendChild(textoEl);
+    linha.appendChild(rotuloOpcao);
+    blocoNumeros.appendChild(linha);
+
+    spansNumeros.push({ item, prefixo, textoEl });
+  });
+
+  const totalEl = document.createElement('div');
+  totalEl.className = 'totalPesquisa';
+  totalEl.textContent = `Total: 0 pessoas`;
+  blocoNumeros.appendChild(totalEl);
+
+  return { blocoNumeros, spansNumeros, totalEl };
+}
 
 function renderizarGraficoPizza(opcoes) {
   if (idAnimacaoGrafico) cancelAnimationFrame(idAnimacaoGrafico);
@@ -1264,39 +1433,7 @@ function renderizarGraficoPizza(opcoes) {
   containerPizza.appendChild(svg);
   painel.appendChild(containerPizza);
 
-  const blocoNumeros = document.createElement('div');
-  blocoNumeros.className = 'numerosPesquisa';
-
-  const spansNumeros = [];
-  opcoes.forEach((item, idx) => {
-    const linha = document.createElement('div');
-    linha.className = 'linhaNumero';
-    linha.style.animationDelay = (0.3 + idx * 0.18) + 's';
-
-    const rotuloOpcao = document.createElement('span');
-    rotuloOpcao.className = 'rotuloOpcao';
-
-    const corEl = document.createElement('span');
-    corEl.className = 'corLegenda';
-    corEl.style.background = item.cor;
-
-    const textoEl = document.createElement('span');
-    const prefixo = item.rotulo || item.nome;
-    textoEl.textContent = `${prefixo}: 0 pessoas`;
-
-    rotuloOpcao.appendChild(corEl);
-    rotuloOpcao.appendChild(textoEl);
-    linha.appendChild(rotuloOpcao);
-    blocoNumeros.appendChild(linha);
-
-    spansNumeros.push({ item, prefixo, textoEl });
-  });
-
-  const totalEl = document.createElement('div');
-  totalEl.className = 'totalPesquisa';
-  totalEl.textContent = `Total: 0 pessoas`;
-  blocoNumeros.appendChild(totalEl);
-
+  const { blocoNumeros, spansNumeros, totalEl } = criarBlocoNumeros(opcoes);
   painel.appendChild(blocoNumeros);
 
   // Animação de abertura radial das fatias + contagem dos números e porcentagens
@@ -1371,6 +1508,138 @@ function renderizarGraficoPizza(opcoes) {
   return painel;
 }
 
+function renderizarGraficoBarrasHorizontal(config) {
+  if (idAnimacaoGrafico) cancelAnimationFrame(idAnimacaoGrafico);
+
+  const opcoes = config.opcoes;
+  const passo = config.passoEscala || 10;
+  const maiorVoto = Math.max(...opcoes.map(o => o.votos));
+  const maxEscala = config.maxEscala || (Math.ceil(maiorVoto / passo) * passo);
+
+  const painel = document.createElement('div');
+  painel.className = 'painelGrafico';
+
+  const quadro = document.createElement('div');
+  quadro.className = 'quadroBarrasH';
+
+  const areaPlotagem = document.createElement('div');
+  areaPlotagem.className = 'areaPlotagemH';
+
+  const gradeVertical = document.createElement('div');
+  gradeVertical.className = 'gradeVerticalH';
+
+  const eixoX = document.createElement('div');
+  eixoX.className = 'eixoXBarrasH';
+
+  for (let v = 0; v <= maxEscala; v += passo) {
+    const posPorc = (v / maxEscala) * 100;
+
+    const linhaG = document.createElement('div');
+    linhaG.className = 'linhaGradeV';
+    linhaG.style.left = posPorc + '%';
+    gradeVertical.appendChild(linhaG);
+
+    const marca = document.createElement('div');
+    marca.className = 'marcaEixoX';
+    marca.style.left = posPorc + '%';
+    marca.textContent = v;
+    eixoX.appendChild(marca);
+  }
+
+  const listaBarras = document.createElement('div');
+  listaBarras.className = 'listaBarrasH';
+
+  const barrasInfo = [];
+
+  opcoes.forEach(item => {
+    const bloco = document.createElement('div');
+    bloco.className = 'blocoBarraH';
+
+    const cabecalho = document.createElement('div');
+    cabecalho.className = 'cabecalhoBarraH';
+
+    const nomeEl = document.createElement('span');
+    nomeEl.className = 'nomeBarraH';
+    nomeEl.textContent = item.nome;
+
+    const valorEl = document.createElement('span');
+    valorEl.className = 'valorBarraH';
+    valorEl.textContent = '0 (0%)';
+
+    cabecalho.appendChild(nomeEl);
+    cabecalho.appendChild(valorEl);
+
+    const trilho = document.createElement('div');
+    trilho.className = 'trilhoBarraH';
+
+    const preenchimento = document.createElement('div');
+    preenchimento.className = 'preenchimentoBarraH';
+    preenchimento.style.background = `linear-gradient(90deg, ${item.cor} 0%, ${item.cor}dd 100%)`;
+    preenchimento.addEventListener('mouseenter', somHover);
+
+    trilho.appendChild(preenchimento);
+    bloco.appendChild(cabecalho);
+    bloco.appendChild(trilho);
+    listaBarras.appendChild(bloco);
+
+    barrasInfo.push({ item, preenchimento, valorEl });
+  });
+
+  areaPlotagem.appendChild(gradeVertical);
+  areaPlotagem.appendChild(listaBarras);
+  areaPlotagem.appendChild(eixoX);
+  quadro.appendChild(areaPlotagem);
+  painel.appendChild(quadro);
+
+  const { blocoNumeros, spansNumeros, totalEl } = criarBlocoNumeros(opcoes);
+  painel.appendChild(blocoNumeros);
+
+  const duracao = 1250;
+  const inicio = performance.now();
+  let ultimoTick = 0;
+
+  function animarBarras(agora) {
+    const t = Math.min(1, (agora - inicio) / duracao);
+    const eased = 1 - Math.pow(1 - t, 3);
+
+    if (agora - ultimoTick > 75 && t < 0.96) {
+      somTecla();
+      ultimoTick = agora;
+    }
+
+    barrasInfo.forEach(b => {
+      const votosAtuais = b.item.votos * eased;
+      const larguraPorc = Math.min(100, (votosAtuais / maxEscala) * 100);
+      b.preenchimento.style.width = larguraPorc.toFixed(2) + '%';
+      b.valorEl.textContent = `${Math.round(votosAtuais)} (${formatarPorcentagem(votosAtuais, TOTAL_PESQUISA)})`;
+    });
+
+    spansNumeros.forEach(s => {
+      const votosAtuais = Math.round(s.item.votos * eased);
+      s.textoEl.textContent = `${s.prefixo}: ${votosAtuais} pessoas`;
+    });
+
+    totalEl.textContent = `Total: ${Math.round(TOTAL_PESQUISA * eased)} pessoas`;
+
+    if (t < 1) {
+      idAnimacaoGrafico = requestAnimationFrame(animarBarras);
+    } else {
+      barrasInfo.forEach(b => {
+        const larguraPorc = Math.min(100, (b.item.votos / maxEscala) * 100);
+        b.preenchimento.style.width = larguraPorc.toFixed(2) + '%';
+        b.valorEl.textContent = `${b.item.votos} (${formatarPorcentagem(b.item.votos, TOTAL_PESQUISA)})`;
+      });
+      spansNumeros.forEach(s => {
+        s.textoEl.textContent = `${s.prefixo}: ${s.item.votos} pessoas`;
+      });
+      totalEl.textContent = `Total: ${TOTAL_PESQUISA} pessoas`;
+    }
+  }
+
+  idAnimacaoGrafico = requestAnimationFrame(animarBarras);
+  return painel;
+}
+
 // ==================== ABERTURA DE CADA PERGUNTA ====================
 function abrirPergunta(chave) {
   conteudoSecao.innerHTML = '';
@@ -1381,8 +1650,13 @@ function abrirPergunta(chave) {
     telaProxima.classList.remove('aparecer', 'sumir');
     telaSecao.classList.add('aparecer');
 
-    if (dadosGraficos[chave]) {
-      conteudoSecao.appendChild(renderizarGraficoPizza(dadosGraficos[chave]));
+    const cfg = dadosGraficos[chave];
+    if (cfg) {
+      if (cfg.tipo === 'barras_horizontal') {
+        conteudoSecao.appendChild(renderizarGraficoBarrasHorizontal(cfg));
+      } else {
+        conteudoSecao.appendChild(renderizarGraficoPizza(cfg.opcoes));
+      }
     } else {
       const aviso = document.createElement('p');
       aviso.className = 'avisoEmBreve';
