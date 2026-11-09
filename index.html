@@ -642,7 +642,7 @@
     flex-direction: column;
     gap: 12px;
     width: 100%;
-    max-width: 400px;
+    max-width: 560px;
     background: rgba(20, 14, 24, 0.82);
     border: 1px solid rgba(163, 0, 0, 0.5);
     border-radius: 6px;
@@ -1500,6 +1500,14 @@ const dadosGraficos = {
       { nome: 'Andrew Garfield', rotulo: 'Andrew Garfield', votos: 28, cor: '#1e4db7' },
       { nome: 'Tom Holland',     rotulo: 'Tom Holland',     votos: 23, cor: '#d4a856' }
     ]
+  },
+  p5: {
+    tipo: 'pizza',
+    opcoes: [
+      { nome: 'Sim',   rotulo: 'SIM, vai ser o melhor!',                                    votos: 70, cor: '#2e8b57' },
+      { nome: 'Não',   rotulo: 'Não, Ultimato deve ser melhor!',                            votos: 35, cor: '#1e4db7' },
+      { nome: 'Nunca', rotulo: 'NUNCA, Ultimato e guerra infinita etc... deve ser melhor.', votos: 3,  cor: '#b31217' }
+    ]
   }
 };
 
@@ -1590,7 +1598,7 @@ function renderizarGraficoPizza(opcoes) {
     grupoFatias.appendChild(path);
 
     const anguloMeio = anguloInicio + anguloFatia / 2;
-    const raioTexto = fracao < 0.14 ? raio * 0.72 : raio * 0.56;
+    const raioTexto = fracao < 0.06 ? raio * 0.8 : (fracao < 0.14 ? raio * 0.72 : raio * 0.56);
     const tx = Math.cos(anguloMeio) * raioTexto;
     const ty = Math.sin(anguloMeio) * raioTexto;
 
@@ -1599,15 +1607,17 @@ function renderizarGraficoPizza(opcoes) {
 
     const txtNome = document.createElementNS(ns, 'text');
     txtNome.setAttribute('x', tx.toFixed(2));
-    txtNome.setAttribute('y', (ty - 6).toFixed(2));
+    txtNome.setAttribute('y', (ty - (fracao < 0.06 ? 4 : 6)).toFixed(2));
     txtNome.setAttribute('class', 'textoFatiaNome');
+    if (fracao < 0.06) txtNome.style.fontSize = '12px';
     txtNome.textContent = item.nome.toUpperCase();
     gLabel.appendChild(txtNome);
 
     const txtPorc = document.createElementNS(ns, 'text');
     txtPorc.setAttribute('x', tx.toFixed(2));
-    txtPorc.setAttribute('y', (ty + 13).toFixed(2));
+    txtPorc.setAttribute('y', (ty + (fracao < 0.06 ? 10 : 13)).toFixed(2));
     txtPorc.setAttribute('class', 'textoFatiaPorc');
+    if (fracao < 0.06) txtPorc.style.fontSize = '11.5px';
     txtPorc.textContent = '0%';
     gLabel.appendChild(txtPorc);
 
