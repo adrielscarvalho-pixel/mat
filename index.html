@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pesquisa Trabalho de Matemática — Super Herói</title>
+  <meta
+    name="description"
+    content="Pesquisa Trabalho de Matemática: Super Herói. Portal interativo de investigação matemática, números primos e física dos super-heróis."
+  />
+  <link rel="stylesheet" href="./index.css" />
+</head>
+<body>
+  <!-- Cabeçalho Principal -->
+  <header class="site-header" id="main-header">
+    <a href="#inicio" class="brand-mark" id="brand-home-link" aria-label="Voltar para a tela inicial">
+      <div class="brand-prime-symbol" aria-hidden="true">ℙ</div>
+      <div class="brand-text-group">
+        <span class="brand-title">Trabalho de Matemática</span>
+        <span class="brand-subtitle">Divisão Super Herói · Números Primos</span>
+      </div>
+    </a>
+
+    <div class="header-status">
+      <div class="prime-ticker" id="header-prime-ticker" aria-live="polite">
+        Sequência Prima Ativa: <strong id="active-prime-value">2 · 3 · 5 · 7 · 11 · 13</strong>
+      </div>
+    </div>
+  </header>
+
+  <!-- Conteúdo Principal -->
+  <main class="app-main" id="app-main-content">
+    <!-- TELA 1: TELA INICIAL -->
+    <section class="screen-view" id="screen-inicio" aria-labelledby="hero-main-heading">
+      <div class="hero-layout">
+        <div class="hero-copy">
+          <p class="chapter-kicker">Apresentação Oficial · Matemática Aplicada</p>
+
+          <h1 class="hero-heading-group" id="hero-main-heading">
+            <span class="hero-main-title" id="title-line-top">Pesquisa Trabalho de Matemática</span>
+            <span class="hero-sub-title" id="title-line-bottom">Super Herói</span>
+          </h1>
+
+          <p class="hero-description" id="hero-intro-text">
+            Bem-vindo à investigação matemática sobre o universo dos Super-Heróis.
+            Explore como números primos, geometria áurea e equações físicas sustentam
+            os poderes mais extraordinários — mas cuidado: tentar abandonar a missão
+            acionará a guarda dos números primos.
+          </p>
+
+          <!-- Botões de Ação Principais: INICIAR e SAIR -->
+          <div class="hero-actions" role="group" aria-label="Ações principais da apresentação">
+            <button type="button" class="btn btn-iniciar" id="btn-iniciar">
+              <span>Iniciar</span>
+              <span class="btn-arrow" aria-hidden="true">→</span>
+            </button>
+
+            <button type="button" class="btn btn-sair" id="btn-sair">
+              <span>Sair</span>
+            </button>
+          </div>
+
+          <!-- Faixa de Fórmulas e Estatísticas -->
+          <div class="hero-formula-strip" id="hero-formula-strip">
+            <div class="formula-item">
+              <span class="formula-code">p ∈ {2, 3, 5, 7, 11, 13, 17…}</span>
+              <span class="formula-caption">Guardiões Primos Indestrutíveis</span>
+            </div>
+            <div class="formula-item">
+              <span class="formula-code">φ = (1 + √5) / 2 ≈ 1,618</span>
+              <span class="formula-caption">Proporção Áurea do Escudo</span>
+            </div>
+            <div class="formula-item">
+              <span class="formula-code" id="exit-attempts-counter">0 bloqueios</span>
+              <span class="formula-caption">Tentativas de fuga impedidas</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Ilustração / Emblema Geométrico do Super Herói -->
+        <div class="hero-visual">
+          <figure class="emblem-frame" id="hero-emblem-container">
+            <img
+              src="./assets/hero-emblem.jpg"
+              alt="Brasão geométrico Super Herói com espiral áurea e números primos 2, 3, 5, 7 e 13"
+              class="emblem-image"
+              id="hero-emblem-img"
+            />
+            <figcaption class="emblem-caption-bar">
+              <span>Escudo Áureo · Matriz Prima</span>
+              <span class="emblem-prime-sequence">ℙ = {2, 3, 5, 7, 13}</span>
+            </figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <!-- TELA 2: PÁGINA INTERATIVA DA PESQUISA (Ao clicar em INICIAR) -->
+    <section class="screen-view" id="screen-pesquisa" aria-labelledby="stage-heading" hidden>
+      <div class="stage-container">
+        <div class="stage-top-bar">
+          <div class="stage-title-block">
+            <h2 id="stage-heading">Central da Pesquisa — Matemática dos Super-Heróis</h2>
+            <p id="stage-subtitle">
+              Segunda página pronta para o conteúdo do trabalho. Teste abaixo o verificador de números primos e o banco de pesquisa.
+            </p>
+          </div>
+
+          <button type="button" class="btn btn-voltar" id="btn-voltar-inicio">
+            <span aria-hidden="true">←</span>
+            <span>Voltar ao Início</span>
+          </button>
+        </div>
+
+        <div class="workspace-grid">
+          <!-- Painel Esquerdo: Laboratório de Números Primos & Superpoderes -->
+          <div class="interactive-panel" id="panel-prime-lab">
+            <h3 class="panel-heading">1. Verificador de Frequência Prima do Herói</h3>
+            <p class="panel-subtext">
+              Digite qualquer número inteiro para descobrir se ele faz parte da elite dos Números Primos que protegem este trabalho.
+            </p>
+
+            <div class="form-group">
+              <label class="form-label" for="input-prime-number">Número de Poder (Inteiro Positivo)</label>
+              <input
+                type="number"
+                id="input-prime-number"
+                class="form-input"
+                value="17"
+                min="1"
+                max="999999"
+                placeholder="Ex: 2, 3, 5, 7, 11, 13, 17..."
+              />
+            </div>
+
+            <div class="prime-verifier-box" id="prime-verifier-output" aria-live="polite">
+              <div class="prime-result-title" id="prime-result-headline">17 é um Número Primo Super-Herói!</div>
+              <p class="prime-result-detail" id="prime-result-explanation">
+                Divisível apenas por 1 e por 17. Faz parte da guarda que impede qualquer saída!
+              </p>
+            </div>
+          </div>
+
+          <!-- Painel Direito: Registro de Pesquisa (LocalStorage / Firebase Ready) -->
+          <div class="interactive-panel" id="panel-research-db">
+            <h3 class="panel-heading">2. Registro da Pesquisa de Super-Heróis</h3>
+            <p class="panel-subtext">
+              Adicione um super-herói e a fórmula matemática analisada pela equipe.
+            </p>
+
+            <form id="form-add-hero" novalidate>
+              <div class="form-group">
+                <label class="form-label" for="input-hero-name">Nome do Super-Herói</label>
+                <input
+                  type="text"
+                  id="input-hero-name"
+                  class="form-input"
+                  placeholder="Ex: Doutor Estranho"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="input-hero-formula">Conceito ou Fórmula Matemática</label>
+                <input
+                  type="text"
+                  id="input-hero-formula"
+                  class="form-input"
+                  placeholder="Ex: Dimensão Fractal de Mandelbrot (z = z² + c)"
+                  required
+                />
+              </div>
+
+              <button type="submit" class="btn btn-iniciar" id="btn-salvar-pesquisa" style="width: 100%; padding: 0.85rem 1.5rem;">
+                <span>Registrar na Pesquisa</span>
+              </button>
+            </form>
+
+            <div class="submissions-list" id="research-entries-list" aria-label="Registros da pesquisa">
+              <!-- Preenchido dinamicamente pelo app.js -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- OVERLAY DE 5 SEGUNDOS AO CLICAR EM SAIR: "OS PRIMOS NÃO DEIXARÃO!" -->
+  <div
+    class="primos-overlay"
+    id="primos-alert-overlay"
+    role="alertdialog"
+    aria-modal="true"
+    aria-labelledby="primos-alert-title"
+    aria-describedby="primos-alert-desc"
+    aria-hidden="true"
+  >
+    <div class="primos-modal">
+      <div class="primos-prime-ring" id="primos-prime-badge">
+        ALERTA DE BLOQUEIO PRIMO · {2, 3, 5, 7, 11, 13, 17, 19, 23}
+      </div>
+
+      <h2 class="primos-message" id="primos-alert-title">
+        OS PRIMOS NÃO DEIXARÃO!
+      </h2>
+
+      <p class="primos-submessage" id="primos-alert-desc">
+        Saída bloqueada pela guarda matemática. Você precisa concluir a Pesquisa de Matemática — Super Herói!
+      </p>
+
+      <div class="primos-timer-track" aria-hidden="true">
+        <div class="primos-timer-fill" id="primos-timer-bar"></div>
+      </div>
+
+      <p class="primos-timer-label" id="primos-timer-countdown">
+        Retornando à missão em 5.0s...
+      </p>
+    </div>
+  </div>
+
+  <!-- Rodapé -->
+  <footer class="site-footer" id="main-footer">
+    <span>Pesquisa Trabalho de Matemática · Super Herói</span>
+    <span class="storage-status-indicator" id="firebase-status-text">
+      Armazenamento Ativo · Pronto para Firebase Hosting
+    </span>
+  </footer>
+
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
