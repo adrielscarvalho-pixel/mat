@@ -477,28 +477,85 @@
   }
   #telaHistoria.sumir { animation: desvanecer 0.8s ease forwards; }
 
-  /* ============ PRÓXIMA PÁGINA (CAPÍTULOS / PERGUNTAS) ============ */
+  /* ============ TELA 4: PERGUNTAS (5 BOTÕES) ============ */
   #telaProxima {
-    background: radial-gradient(ellipse at center, #16121c 0%, #0a0a0f 75%);
+    background: linear-gradient(#0d0d14 0%, #16121c 50%, #0d0d14 100%);
     z-index: 15;
     display: none;
     opacity: 0;
-    gap: 32px;
-    padding: 0 24px;
-    text-align: center;
   }
   #telaProxima.aparecer {
     display: flex;
     animation: surgir 1s ease forwards;
   }
-  #telaProxima.sumir { animation: desvanecer 0.6s ease forwards; }
+  #telaProxima.sumir { animation: desvanecer 0.5s ease forwards; }
+  #conteudoPerguntas {
+    position: relative;
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 28px;
+    padding: 0 20px;
+  }
   #tituloProxima {
     font-family: 'Pirata One', cursive;
-    font-size: clamp(2rem, 5.5vw, 3.8rem);
+    font-size: clamp(2rem, 5.5vw, 3.6rem);
     color: #a30000;
     letter-spacing: 2px;
     text-shadow: 0 0 15px rgba(163,0,0,0.8), 2px 2px 2px #000;
     animation: brasa 3s ease-in-out infinite;
+  }
+  #gradePerguntas {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(250px, 380px));
+    gap: 16px 22px;
+  }
+  .botaoPergunta {
+    font-size: clamp(0.95rem, 1.9vw, 1.25rem);
+    letter-spacing: 2px;
+    padding: 16px 20px;
+    width: 100%;
+  }
+  .botaoPergunta.centralizado {
+    grid-column: 1 / -1;
+    justify-self: center;
+    max-width: 480px;
+  }
+  @media (max-width: 640px) {
+    #gradePerguntas { grid-template-columns: minmax(240px, 1fr); }
+    .botaoPergunta.centralizado { max-width: 100%; }
+  }
+
+  /* ============ TELA 5: CONTEÚDO DE CADA PERGUNTA / GRÁFICO ============ */
+  #telaSecao {
+    background: radial-gradient(ellipse at center, #16121c 0%, #0a0a0f 75%);
+    z-index: 25;
+    display: none;
+    opacity: 0;
+    overflow-y: auto;
+    justify-content: safe center;
+    padding: 50px 0;
+  }
+  #telaSecao.aparecer { display: flex; animation: surgir 0.7s ease forwards; }
+  #telaSecao.sumir { animation: desvanecer 0.5s ease forwards; }
+  #tituloSecao {
+    font-family: 'Pirata One', cursive;
+    font-size: clamp(1.7rem, 4.5vw, 3rem);
+    color: #a30000;
+    text-shadow: 0 0 15px rgba(163,0,0,0.8), 2px 2px 2px #000;
+    margin-bottom: 40px;
+    text-align: center;
+    padding: 0 24px;
+    max-width: 900px;
+  }
+  #conteudoSecao {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    max-width: 800px;
+    padding: 0 24px;
   }
   .avisoEmBreve {
     font-family: 'Cinzel', serif;
@@ -506,15 +563,37 @@
     color: #8a8a9a;
     font-size: clamp(1.1rem, 2.5vw, 1.6rem);
   }
+  #btnVoltar {
+    margin-top: 50px;
+    font-size: clamp(1rem, 2.2vw, 1.4rem);
+    padding: 12px 45px;
+  }
 
   /* ============ VERSÃO PARA CELULAR ============ */
+  .modoCelular #gradePerguntas {
+    grid-template-columns: 1fr;
+    width: min(340px, 88vw);
+    gap: 12px;
+  }
+  .modoCelular .botaoPergunta { padding: 14px 12px; font-size: 1rem; letter-spacing: 1px; }
+  .modoCelular #telaProxima {
+    overflow-y: auto;
+    justify-content: safe center;
+    padding: 34px 0;
+  }
+  .modoCelular #conteudoPerguntas { gap: 20px; }
+  .modoCelular #tituloProxima { font-size: clamp(1.6rem, 8vw, 2.4rem); }
   .modoCelular .estante { height: 88px; opacity: 0.22; }
   .modoCelular .trilhoLivros { height: 78px; }
   .modoCelular .livro { width: 18px; }
+  .modoCelular #telaSecao { padding: 26px 0; }
+  .modoCelular #tituloSecao { margin-bottom: 26px; }
+  .modoCelular #conteudoSecao { gap: 14px; padding: 0 14px; }
   .modoCelular .botaoEscolha { width: min(320px, 86vw); padding: 16px 10px; font-size: 1.05rem; }
   .modoCelular #botoes .botao { padding: 15px 60px; }
   .modoCelular #textoHistoria { padding: 0 18px; gap: 16px; }
   .modoCelular #btnAvancar { margin-top: 38px; }
+  .modoCelular #btnVoltar { margin-top: 38px; }
   .modoCelular .pena { font-size: 20px; }
   .modoCelular .botaoInicio { padding: 10px 24px; letter-spacing: 2px; }
   .modoCelular #perguntaDispositivo { font-size: clamp(1.2rem, 6vw, 1.8rem); }
@@ -571,11 +650,29 @@
     <button class="botao" id="btnAvancar">TOQUE PARA AVANÇAR</button>
   </div>
 
-  <!-- TELA PRÓXIMA (perguntas / gráficos que vamos montar) -->
+  <!-- TELA 4: 5 botões das perguntas -->
   <div class="tela" id="telaProxima">
-    <h1 id="tituloProxima">Super heroi</h1>
-    <p class="avisoEmBreve">Em breve...</p>
-    <button class="botao botaoInicio" id="btnVoltarInicio">VOLTAR AO INÍCIO</button>
+    <div class="estante estanteCima"><div class="trilhoLivros"></div></div>
+    <div class="estante estanteBaixo"><div class="trilhoLivros"></div></div>
+    <div class="vinheta"></div>
+    <div id="conteudoPerguntas">
+      <h1 id="tituloProxima">Super heroi</h1>
+      <div id="gradePerguntas">
+        <button class="botao botaoPergunta" data-pergunta="p1">Você prefere marvel ou DC?</button>
+        <button class="botao botaoPergunta" data-pergunta="p2">Em guerra civil, você é time Homem de ferro ou capitão america?</button>
+        <button class="botao botaoPergunta" data-pergunta="p3">Qual seu vilão favorito?</button>
+        <button class="botao botaoPergunta" data-pergunta="p4">Qual Ator do homem aranha você prefere?</button>
+        <button class="botao botaoPergunta centralizado" data-pergunta="p5">Acha que vingadores doons day vai ser o melhor filmes de vingadores?</button>
+      </div>
+      <button class="botao botaoInicio" id="btnVoltarInicio">VOLTAR AO INÍCIO</button>
+    </div>
+  </div>
+
+  <!-- TELA 5: conteúdo / gráfico de cada pergunta -->
+  <div class="tela" id="telaSecao">
+    <h1 id="tituloSecao"></h1>
+    <div id="conteudoSecao"></div>
+    <button class="botao" id="btnVoltar">VOLTAR</button>
   </div>
 
   <!-- TELA SAIR: aparece por 5 segundos após clicar em SAIR -->
@@ -711,6 +808,7 @@ document.querySelectorAll('.trilhoLivros').forEach(criarLivros);
 
 // ==================== FUNDO ANIMADO (heróis, números primos e símbolos) ====================
 const telaMenu = document.getElementById('telaMenu');
+const telaProxima = document.getElementById('telaProxima');
 
 function povoarFundo(tela) {
   const svgGraficoPizza = `<svg viewBox="0 0 40 40" width="1.15em" height="1.15em" style="display:block;filter:drop-shadow(2px 2px 2px rgba(0,0,0,0.85));"><circle cx="19" cy="21" r="15" fill="#2a3a5c" stroke="#000" stroke-width="1.5"/><path d="M19,21 L19,6 A15,15 0 0,1 33.5,24.8 Z" fill="#d4a856" stroke="#000" stroke-width="1.5"/><path d="M19,21 L33.5,24.8 A15,15 0 0,1 10.2,33.1 Z" fill="#3d5c2a" stroke="#000" stroke-width="1.5"/><path d="M21,19 L21,4 A15,15 0 0,0 7.2,13.2 Z" fill="#a30000" stroke="#000" stroke-width="1.5"/></svg>`;
@@ -747,6 +845,7 @@ function povoarFundo(tela) {
   }
 }
 povoarFundo(telaMenu);
+povoarFundo(telaProxima);
 
 // ==================== CELULAR OU COMPUTADOR ====================
 let particulasPorSplash = 28;
@@ -797,11 +896,14 @@ const flash = document.getElementById('flash');
 const telaSplash2 = document.getElementById('telaSplash2');
 const tituloSplash2 = document.getElementById('tituloSplash2');
 const dicaSplash2 = document.getElementById('dicaSplash2');
-const telaProxima = document.getElementById('telaProxima');
 const btnVoltarInicio = document.getElementById('btnVoltarInicio');
 const telaHistoria = document.getElementById('telaHistoria');
 const textoHistoria = document.getElementById('textoHistoria');
 const btnAvancar = document.getElementById('btnAvancar');
+const telaSecao = document.getElementById('telaSecao');
+const tituloSecao = document.getElementById('tituloSecao');
+const conteudoSecao = document.getElementById('conteudoSecao');
+const btnVoltar = document.getElementById('btnVoltar');
 
 // As páginas de texto após clicar em INICIAR
 const paginasHistoria = [
@@ -815,6 +917,14 @@ const paginasHistoria = [
     { texto: 'espero que gostem.', classe: 'linhaNormal' }
   ]
 ];
+
+const titulosPerguntas = {
+  p1: 'Você prefere marvel ou DC?',
+  p2: 'Em guerra civil, você é time Homem de ferro ou capitão america?',
+  p3: 'Qual seu vilão favorito?',
+  p4: 'Qual Ator do homem aranha você prefere?',
+  p5: 'Acha que vingadores doons day vai ser o melhor filmes de vingadores?'
+};
 
 let paginaAtual = 0;
 let geracaoHistoria = 0;
@@ -921,6 +1031,40 @@ function mostrarSplash2() {
   }, 1300);
 }
 
+// ==================== ABERTURA DE CADA PERGUNTA ====================
+function abrirPergunta(chave) {
+  conteudoSecao.innerHTML = '';
+  tituloSecao.textContent = titulosPerguntas[chave] || '';
+  const aviso = document.createElement('p');
+  aviso.className = 'avisoEmBreve';
+  aviso.textContent = 'Em breve...';
+  conteudoSecao.appendChild(aviso);
+
+  telaProxima.classList.add('sumir');
+  setTimeout(() => {
+    telaProxima.classList.remove('aparecer', 'sumir');
+    telaSecao.classList.add('aparecer');
+  }, 500);
+}
+
+document.querySelectorAll('.botaoPergunta').forEach(botao => {
+  botao.addEventListener('mouseenter', somHover);
+  botao.addEventListener('click', () => {
+    somClique();
+    abrirPergunta(botao.dataset.pergunta);
+  });
+});
+
+btnVoltar.addEventListener('mouseenter', somHover);
+btnVoltar.addEventListener('click', () => {
+  somClique();
+  telaSecao.classList.add('sumir');
+  setTimeout(() => {
+    telaSecao.classList.remove('aparecer', 'sumir');
+    telaProxima.classList.add('aparecer');
+  }, 500);
+});
+
 // ==================== BOTÕES DO MENU ====================
 const btnIniciar = document.getElementById('btnIniciar');
 const btnSair = document.getElementById('btnSair');
@@ -963,7 +1107,7 @@ btnAvancar.addEventListener('click', () => {
 btnVoltarInicio.addEventListener('click', () => {
   somClique();
   geracaoHistoria++;
-  [telaProxima, telaHistoria, telaSplash2].forEach(tela => {
+  [telaProxima, telaSecao, telaHistoria, telaSplash2].forEach(tela => {
     tela.classList.remove('aparecer', 'sumir', 'tremer', 'sair');
     tela.style.display = '';
     tela.style.opacity = '';
@@ -971,6 +1115,7 @@ btnVoltarInicio.addEventListener('click', () => {
   dicaSplash2.classList.remove('mostrar');
   tituloSplash2.classList.remove('entrar');
   textoHistoria.innerHTML = '';
+  conteudoSecao.innerHTML = '';
   btnAvancar.classList.remove('visivel');
   paginaAtual = 0;
   telaMenu.style.display = '';
