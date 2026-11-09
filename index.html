@@ -36,9 +36,9 @@
         <div class="hero-copy">
           <p class="chapter-kicker">Apresentação Oficial · Matemática Aplicada</p>
 
-          <h1 class="hero-heading-group" id="hero-main-heading">
-            <span class="hero-main-title" id="title-line-top">Pesquisa Trabalho de Matemática</span>
-            <span class="hero-sub-title" id="title-line-bottom">Super Herói</span>
+          <h1 class="hero-heading-group" id="hero-main-heading" title="Clique nas letras para repetir a animação">
+            <span class="hero-main-title" id="title-line-top" data-text="Pesquisa Trabalho de Matemática">Pesquisa Trabalho de Matemática</span>
+            <span class="hero-sub-title" id="title-line-bottom" data-text="Super Herói">Super Herói</span>
           </h1>
 
           <p class="hero-description" id="hero-intro-text">
@@ -100,7 +100,9 @@
       <div class="stage-container">
         <div class="stage-top-bar">
           <div class="stage-title-block">
-            <h2 id="stage-heading">Central da Pesquisa — Matemática dos Super-Heróis</h2>
+            <h2 id="stage-heading" data-text="Central da Pesquisa — Matemática dos Super-Heróis">
+              Central da Pesquisa — Matemática dos Super-Heróis
+            </h2>
             <p id="stage-subtitle">
               Segunda página pronta para o conteúdo do trabalho. Teste abaixo o verificador de números primos e o banco de pesquisa.
             </p>
@@ -195,12 +197,14 @@
     aria-describedby="primos-alert-desc"
     aria-hidden="true"
   >
+    <div class="floating-primes-stage" id="floating-primes-stage" aria-hidden="true"></div>
+
     <div class="primos-modal">
       <div class="primos-prime-ring" id="primos-prime-badge">
         ALERTA DE BLOQUEIO PRIMO · {2, 3, 5, 7, 11, 13, 17, 19, 23}
       </div>
 
-      <h2 class="primos-message" id="primos-alert-title">
+      <h2 class="primos-message" id="primos-alert-title" data-text="OS PRIMOS NÃO DEIXARÃO!">
         OS PRIMOS NÃO DEIXARÃO!
       </h2>
 

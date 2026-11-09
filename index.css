@@ -1,6 +1,6 @@
 /* ==========================================================================
    PESQUISA TRABALHO DE MATEMÁTICA — SUPER HERÓI
-   Core Design System & Tokens (HSL Curated Palette)
+   Core Design System, Kinetic Typography & Animations
    ========================================================================== */
 
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap');
@@ -72,8 +72,8 @@ body {
   min-height: 100vh;
   background-color: var(--bg-base);
   background-image:
-    radial-gradient(ellipse 80% 50% at 50% -10%, hsla(41, 88%, 56%, 0.11), transparent 70%),
-    radial-gradient(ellipse 60% 50% at 85% 95%, hsla(354, 78%, 52%, 0.08), transparent 65%);
+    radial-gradient(ellipse 80% 50% at 50% -10%, hsla(41, 88%, 56%, 0.12), transparent 70%),
+    radial-gradient(ellipse 60% 50% at 85% 95%, hsla(354, 78%, 52%, 0.09), transparent 65%);
   color: var(--text-primary);
   font-family: var(--font-sans);
   line-height: 1.6;
@@ -90,6 +90,161 @@ body::before {
   z-index: 1;
   opacity: 0.035;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+/* ==========================================================================
+   Kinetic Typography System (Letras se Mexendo ao Aparecer e em Onda)
+   ========================================================================== */
+
+.kinetic-word {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.kinetic-space {
+  display: inline-block;
+  width: 0.3em;
+}
+
+.kinetic-char {
+  display: inline-block;
+  transform-origin: 50% 85%;
+  will-change: transform, opacity, filter;
+  opacity: 0;
+  animation:
+    charPopReveal 0.68s var(--ease-spring) forwards,
+    charLivingWave 3.2s ease-in-out infinite;
+  animation-delay:
+    calc(var(--char-index, 0) * 0.038s),
+    calc(0.72s + var(--char-index, 0) * 0.065s);
+  transition: color 0.18s ease, transform 0.2s var(--ease-spring);
+  cursor: default;
+}
+
+.kinetic-char:hover {
+  color: var(--gold-400);
+  transform: translateY(-8px) scale(1.18) rotate(-4deg) !important;
+}
+
+.kinetic-char.is-scrambling {
+  color: var(--gold-400);
+  font-family: var(--font-mono);
+}
+
+/* Entrada elástica 3D das letras */
+@keyframes charPopReveal {
+  0% {
+    opacity: 0;
+    transform: translateY(42px) rotateX(-85deg) rotateZ(-12deg) scale(0.45);
+    filter: blur(6px);
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(-9px) rotateX(12deg) rotateZ(4deg) scale(1.08);
+    filter: blur(0px);
+  }
+  82% {
+    transform: translateY(3px) rotateX(-4deg) rotateZ(-1.5deg) scale(0.97);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) rotateX(0deg) rotateZ(0deg) scale(1);
+    filter: blur(0px);
+  }
+}
+
+/* Movimento contínuo em onda das letras */
+@keyframes charLivingWave {
+  0%, 100% {
+    transform: translateY(0px) rotateZ(0deg);
+  }
+  50% {
+    transform: translateY(-5px) rotateZ(1.8deg);
+  }
+}
+
+/* Entrada + Vibração dramática das letras do "OS PRIMOS NÃO DEIXARÃO!" */
+.primos-kinetic-char {
+  display: inline-block;
+  opacity: 0;
+  transform-origin: center center;
+  will-change: transform, opacity;
+  animation:
+    primosCharSlam 0.45s var(--ease-spring) forwards,
+    primosCharJitter 0.28s ease-in-out infinite alternate;
+  animation-delay:
+    calc(var(--char-index, 0) * 0.032s),
+    calc(0.45s + var(--char-index, 0) * 0.032s);
+}
+
+@keyframes primosCharSlam {
+  0% {
+    opacity: 0;
+    transform: translateY(-55px) scale(2.1) rotate(-14deg);
+    filter: blur(8px);
+    color: var(--gold-400);
+  }
+  70% {
+    opacity: 1;
+    transform: translateY(6px) scale(0.92) rotate(4deg);
+    filter: blur(0px);
+    color: var(--crimson-400);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1) rotate(0deg);
+    color: var(--text-primary);
+  }
+}
+
+@keyframes primosCharJitter {
+  0% {
+    transform: translate3d(-1.5px, -2px, 0) rotate(-1.5deg) scale(1.02);
+    color: var(--text-primary);
+  }
+  50% {
+    transform: translate3d(1.5px, 2px, 0) rotate(1.5deg) scale(0.98);
+    color: var(--crimson-400);
+  }
+  100% {
+    transform: translate3d(-1px, 1.5px, 0) rotate(1deg) scale(1.04);
+    color: var(--gold-400);
+  }
+}
+
+/* Números Primos Flutuantes no Overlay de Bloqueio */
+.floating-primes-stage {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.floating-prime-particle {
+  position: absolute;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  color: hsla(354, 84%, 64%, 0.22);
+  user-select: none;
+  animation: floatPrimeUp 3.6s linear infinite;
+}
+
+@keyframes floatPrimeUp {
+  0% {
+    transform: translateY(110vh) rotate(0deg) scale(0.8);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-20vh) rotate(360deg) scale(1.25);
+    opacity: 0;
+  }
 }
 
 /* ==========================================================================
@@ -129,6 +284,11 @@ body::before {
   font-size: 0.95rem;
   color: var(--gold-400);
   letter-spacing: -0.03em;
+  transition: transform 0.3s var(--ease-spring);
+}
+
+.brand-mark:hover .brand-prime-symbol {
+  transform: rotate(-10deg) scale(1.1);
 }
 
 .brand-text-group {
@@ -240,14 +400,15 @@ body::before {
 
 .hero-heading-group {
   margin-bottom: 1.65rem;
+  perspective: 800px;
 }
 
 .hero-main-title {
   font-family: var(--font-display);
-  font-size: clamp(2.35rem, 4.5vw, 3.85rem);
+  font-size: clamp(2.25rem, 4.3vw, 3.75rem);
   font-weight: 700;
-  line-height: 1.06;
-  letter-spacing: -0.03em;
+  line-height: 1.12;
+  letter-spacing: -0.025em;
   color: var(--text-primary);
   display: block;
 }
@@ -256,11 +417,11 @@ body::before {
   font-family: var(--font-display);
   font-size: clamp(1.75rem, 3.2vw, 2.75rem);
   font-weight: 700;
-  line-height: 1.15;
+  line-height: 1.18;
   letter-spacing: -0.02em;
   color: var(--gold-400);
   display: block;
-  margin-top: 0.45rem;
+  margin-top: 0.5rem;
 }
 
 .hero-description {
@@ -323,7 +484,7 @@ body::before {
 
 .btn-iniciar:hover {
   background-color: var(--gold-400);
-  transform: translateY(-2px);
+  transform: translateY(-3px) scale(1.02);
   box-shadow: 0 16px 34px -6px hsla(41, 88%, 56%, 0.55);
 }
 
@@ -332,7 +493,7 @@ body::before {
 }
 
 .btn-iniciar:hover .btn-arrow {
-  transform: translateX(4px);
+  transform: translateX(5px);
 }
 
 /* Botão SAIR */
@@ -347,7 +508,7 @@ body::before {
   background-color: var(--crimson-subtle);
   color: var(--crimson-400);
   border-color: hsla(354, 78%, 52%, 0.35);
-  transform: translateY(-2px);
+  transform: translateY(-3px);
 }
 
 /* Mathematical Footnote / Formula Strip */
@@ -394,6 +555,16 @@ body::before {
   display: flex;
   align-items: center;
   justify-content: center;
+  animation: emblemFloat 5s ease-in-out infinite;
+}
+
+@keyframes emblemFloat {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
 }
 
 .emblem-image {
@@ -405,7 +576,7 @@ body::before {
 }
 
 .emblem-frame:hover .emblem-image {
-  transform: scale(1.03);
+  transform: scale(1.04);
 }
 
 .emblem-caption-bar {
@@ -599,7 +770,7 @@ body::before {
   inset: 0;
   z-index: 100;
   background-color: hsla(220, 30%, 5%, 0.94);
-  backdrop-filter: blur(12px);
+  backdrop-filter: blur(14px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -617,8 +788,10 @@ body::before {
 }
 
 .primos-modal {
+  position: relative;
+  z-index: 2;
   width: 100%;
-  max-width: 640px;
+  max-width: 680px;
   background-color: var(--bg-surface);
   border: 1px solid hsla(354, 78%, 52%, 0.45);
   border-radius: var(--radius-lg);
@@ -631,14 +804,14 @@ body::before {
 
 .primos-overlay.is-active .primos-modal {
   transform: scale(1);
-  animation: primosShake 0.48s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+  animation: primosShake 0.52s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
 }
 
 @keyframes primosShake {
-  10%, 90% { transform: translate3d(-3px, 0, 0); }
-  20%, 80% { transform: translate3d(5px, 0, 0); }
-  30%, 50%, 70% { transform: translate3d(-7px, 0, 0); }
-  40%, 60% { transform: translate3d(7px, 0, 0); }
+  10%, 90% { transform: translate3d(-4px, 0, 0); }
+  20%, 80% { transform: translate3d(6px, 0, 0); }
+  30%, 50%, 70% { transform: translate3d(-9px, 0, 0); }
+  40%, 60% { transform: translate3d(9px, 0, 0); }
 }
 
 .primos-prime-ring {
@@ -660,11 +833,12 @@ body::before {
   font-family: var(--font-display);
   font-size: clamp(2rem, 4.8vw, 3.25rem);
   font-weight: 700;
-  line-height: 1.08;
+  line-height: 1.14;
   letter-spacing: -0.02em;
   color: var(--text-primary);
   margin-bottom: 1rem;
   text-transform: uppercase;
+  perspective: 600px;
 }
 
 .primos-submessage {

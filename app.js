@@ -7,10 +7,15 @@ import {
 } from "./firebase-config.js";
 
 const EXIT_LOCK_DURATION_MS = 5000;
+const MATH_SCRAMBLE_GLYPHS = ["2", "3", "5", "7", "11", "13", "π", "φ", "∑", "√"];
 
 // Elementos da Tela Inicial e Navegação
 const screenInicio = document.getElementById("screen-inicio");
 const screenPesquisa = document.getElementById("screen-pesquisa");
+const titleLineTop = document.getElementById("title-line-top");
+const titleLineBottom = document.getElementById("title-line-bottom");
+const heroMainHeading = document.getElementById("hero-main-heading");
+const stageHeading = document.getElementById("stage-heading");
 const btnIniciar = document.getElementById("btn-iniciar");
 const btnSair = document.getElementById("btn-sair");
 const btnVoltarInicio = document.getElementById("btn-voltar-inicio");
@@ -20,6 +25,8 @@ const firebaseStatusText = document.getElementById("firebase-status-text");
 
 // Elementos do Overlay de 5 Segundos ("OS PRIMOS NÃO DEIXARÃO!")
 const primosOverlay = document.getElementById("primos-alert-overlay");
+const primosAlertTitle = document.getElementById("primos-alert-title");
+const floatingPrimesStage = document.getElementById("floating-primes-stage");
 const primosTimerBar = document.getElementById("primos-timer-bar");
 const primosTimerCountdown = document.getElementById("primos-timer-countdown");
 
@@ -36,6 +43,114 @@ let activeExitTimeoutId = null;
 let activeAnimationFrameId = null;
 
 /**
+ * Transforma o texto de um elemento em letras individuais animadas (Kinetic Typography)
+ * que se mexem ao aparecer (pulo 3D + decodificação matemática + onda viva contínua).
+ */
+function animateKineticText(element, options = {}) {
+  if (!element) return 0;
+
+  const {
+    charClass = "kinetic-char",
+    startIndex = 0,
+    scramble = true
+  } = options;
+
+  const rawText = element.getAttribute("data-text") || element.textContent.trim();
+  element.setAttribute("data-text", rawText);
+  element.setAttribute("aria-label", rawText);
+  element.innerHTML = "";
+
+  const words = rawText.split(" ");
+  let charGlobalIndex = startIndex;
+
+  words.forEach((word, wordIdx) => {
+    const wordSpan = document.createElement("span");
+    wordSpan.className = "kinetic-word";
+    wordSpan.setAttribute("aria-hidden", "true");
+
+    Array.from(word).forEach((letter) => {
+      const charSpan = document.createElement("span");
+      charSpan.className = charClass;
+      const currentIdx = charGlobalIndex++;
+      charSpan.style.setProperty("--char-index", String(currentIdx));
+      charSpan.textContent = letter;
+
+      if (scramble) {
+        const delayMs = currentIdx * 38;
+        setTimeout(() => {
+          charSpan.classList.add("is-scrambling");
+          let ticks = 0;
+          const scrambleInterval = setInterval(() => {
+            ticks++;
+            if (ticks >= 4) {
+              clearInterval(scrambleInterval);
+              charSpan.textContent = letter;
+              charSpan.classList.remove("is-scrambling");
+            } else {
+              charSpan.textContent =
+                MATH_SCRAMBLE_GLYPHS[
+                  Math.floor(Math.random() * MATH_SCRAMBLE_GLYPHS.length)
+                ];
+            }
+          }, 45);
+        }, delayMs);
+      }
+
+      wordSpan.appendChild(charSpan);
+    });
+
+    element.appendChild(wordSpan);
+
+    if (wordIdx < words.length - 1) {
+      const spaceSpan = document.createElement("span");
+      spaceSpan.className = "kinetic-space";
+      spaceSpan.setAttribute("aria-hidden", "true");
+      spaceSpan.innerHTML = "&nbsp;";
+      element.appendChild(spaceSpan);
+    }
+  });
+
+  return charGlobalIndex;
+}
+
+/**
+ * Dispara a animação das letras do título principal:
+ * "Pesquisa Trabalho de Matemática" (em cima) e "Super Herói" (embaixo)
+ */
+function triggerMainTitleAnimation() {
+  const nextIndex = animateKineticText(titleLineTop, {
+    charClass: "kinetic-char",
+    startIndex: 0,
+    scramble: true
+  });
+  animateKineticText(titleLineBottom, {
+    charClass: "kinetic-char",
+    startIndex: nextIndex + 2,
+    scramble: true
+  });
+}
+
+/**
+ * Cria partículas de números primos subindo ao fundo quando clica em SAIR
+ */
+function spawnFloatingPrimes() {
+  if (!floatingPrimesStage) return;
+  floatingPrimesStage.innerHTML = "";
+  const primesList = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47];
+
+  for (let i = 0; i < 18; i++) {
+    const p = document.createElement("span");
+    p.className = "floating-prime-particle";
+    p.textContent = String(primesList[i % primesList.length]);
+    p.style.left = `${(i * 5.6 + Math.random() * 4) % 96}%`;
+    p.style.fontSize = `${1.25 + (i % 4) * 0.65}rem`;
+    p.style.animationDuration = `${2.2 + (i % 5) * 0.45}s`;
+    p.style.animationDelay = `${(i % 6) * 0.18}s`;
+    floatingPrimesStage.appendChild(p);
+  }
+}
+
+/**
  * Emite um pulso sonoro sintetizado via Web Audio API quando o usuário tenta clicar em "Sair"
  */
 function playPrimeGuardianTone() {
@@ -45,7 +160,6 @@ function playPrimeGuardianTone() {
     const ctx = new AudioCtx();
     const now = ctx.currentTime;
 
-    // Frequências baseadas em proporções de números primos (220Hz, 330Hz, 550Hz)
     [220, 277.18, 330].forEach((freq, idx) => {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
@@ -76,6 +190,13 @@ function navigateToScreen(targetScreen, updateHash = true) {
     screenPesquisa.classList.remove("screen-entering");
     void screenPesquisa.offsetWidth;
     screenPesquisa.classList.add("screen-entering");
+
+    animateKineticText(stageHeading, {
+      charClass: "kinetic-char",
+      startIndex: 0,
+      scramble: true
+    });
+
     if (updateHash && window.location.hash !== "#pesquisa") {
       history.pushState({ screen: "pesquisa" }, "", "#pesquisa");
     }
@@ -86,6 +207,9 @@ function navigateToScreen(targetScreen, updateHash = true) {
     screenInicio.classList.remove("screen-entering");
     void screenInicio.offsetWidth;
     screenInicio.classList.add("screen-entering");
+
+    triggerMainTitleAnimation();
+
     if (updateHash && window.location.hash === "#pesquisa") {
       history.pushState({ screen: "inicio" }, "", "#inicio");
     }
@@ -95,6 +219,7 @@ function navigateToScreen(targetScreen, updateHash = true) {
 
 /**
  * Exibe a mensagem "OS PRIMOS NÃO DEIXARÃO!" por exatos 5 segundos (5000ms)
+ * com todas as letras saltando e vibrando!
  */
 function triggerPrimosExitLock() {
   if (activeExitTimeoutId) {
@@ -108,6 +233,13 @@ function triggerPrimosExitLock() {
 
   const totalBlocked = incrementBlockedExitCount();
   updateExitCounterDisplay(totalBlocked);
+
+  spawnFloatingPrimes();
+  animateKineticText(primosAlertTitle, {
+    charClass: "primos-kinetic-char",
+    startIndex: 0,
+    scramble: false
+  });
 
   primosOverlay.classList.add("is-active");
   primosOverlay.setAttribute("aria-hidden", "false");
@@ -232,6 +364,7 @@ function renderResearchEntries() {
 
 // Inicialização de Eventos
 function initApp() {
+  triggerMainTitleAnimation();
   updateExitCounterDisplay(getBlockedExitCount());
   renderResearchEntries();
   renderPrimeAnalysis();
@@ -239,6 +372,13 @@ function initApp() {
   const fbConfig = getActiveFirebaseConfig();
   if (fbConfig && firebaseStatusText) {
     firebaseStatusText.textContent = `Firebase Conectado (${fbConfig.projectId})`;
+  }
+
+  // Permite clicar no título principal para repetir a animação das letras
+  if (heroMainHeading) {
+    heroMainHeading.addEventListener("click", () => {
+      triggerMainTitleAnimation();
+    });
   }
 
   // Clique em INICIAR -> Vai para a outra página
