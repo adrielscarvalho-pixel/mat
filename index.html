@@ -573,8 +573,17 @@
     max-width: 520px;
   }
   @keyframes surgirPizza {
-    0%   { opacity: 0; transform: scale(0.7) rotate(-18deg); }
+    0%   { opacity: 0; transform: scale(0.3) rotate(-140deg); }
+    70%  { opacity: 1; transform: scale(1.06) rotate(6deg); }
     100% { opacity: 1; transform: scale(1) rotate(0deg); }
+  }
+  @keyframes subirNumeros {
+    0%   { opacity: 0; transform: translateY(28px) scale(0.95); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  @keyframes entrarLinhaNumero {
+    0%   { opacity: 0; transform: translateX(-22px); }
+    100% { opacity: 1; transform: translateX(0); }
   }
   .containerPizza {
     position: relative;
@@ -582,7 +591,7 @@
     justify-content: center;
     align-items: center;
     filter: drop-shadow(0 12px 26px rgba(0,0,0,0.9));
-    animation: surgirPizza 0.65s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    animation: surgirPizza 1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
   }
   .svgPizza {
     width: clamp(230px, 52vw, 300px);
@@ -595,8 +604,20 @@
     transform-origin: 0px 0px;
   }
   .fatiaPizza:hover {
-    transform: scale(1.04);
-    filter: brightness(1.15) drop-shadow(0 0 10px rgba(255,255,255,0.25));
+    transform: scale(1.05);
+    filter: brightness(1.18) drop-shadow(0 0 12px rgba(255,255,255,0.3));
+  }
+  .grupoLabelFatia {
+    opacity: 0;
+    transform: scale(0.4);
+    transform-box: fill-box;
+    transform-origin: center;
+    transition: opacity 0.35s ease, transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+    pointer-events: none;
+  }
+  .grupoLabelFatia.visivel {
+    opacity: 1;
+    transform: scale(1);
   }
   .textoFatiaNome {
     font-family: 'Bangers', cursive;
@@ -627,6 +648,8 @@
     border-radius: 6px;
     padding: 18px 24px;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7), inset 0 0 18px rgba(163, 0, 0, 0.14);
+    opacity: 0;
+    animation: subirNumeros 0.65s ease 0.25s forwards;
   }
   .linhaNumero {
     display: flex;
@@ -638,6 +661,8 @@
     color: #e8e4dc;
     padding: 6px 0;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    opacity: 0;
+    animation: entrarLinhaNumero 0.5s ease forwards;
   }
   .linhaNumero:last-of-type {
     border-bottom: none;
@@ -1143,8 +1168,8 @@ const TOTAL_PESQUISA = 108;
 
 const dadosGraficos = {
   p1: [
-    { nome: 'Marvel', votos: 85, cor: '#b31217', rotuloNumero: 'Marvel: 85 pessoas' },
-    { nome: 'DC',     votos: 23, cor: '#1e4db7', rotuloNumero: 'Dc: 23 pessoas' }
+    { nome: 'Marvel', rotulo: 'Marvel', votos: 85, cor: '#b31217' },
+    { nome: 'DC',     rotulo: 'Dc',     votos: 23, cor: '#1e4db7' }
   ]
 };
 
@@ -1156,7 +1181,11 @@ function formatarPorcentagem(votos, total = TOTAL_PESQUISA) {
     : arredondado.toFixed(1).replace('.', ',') + '%';
 }
 
+let idAnimacaoGrafico = null;
+
 function renderizarGraficoPizza(opcoes) {
+  if (idAnimacaoGrafico) cancelAnimationFrame(idAnimacaoGrafico);
+
   const painel = document.createElement('div');
   painel.className = 'painelGrafico';
 
@@ -1169,30 +1198,23 @@ function renderizarGraficoPizza(opcoes) {
   svg.setAttribute('class', 'svgPizza');
 
   const raio = 118;
-  let anguloAtual = -Math.PI / 2;
+  let anguloAcumulado = -Math.PI / 2;
 
   const grupoFatias = document.createElementNS(ns, 'g');
   const grupoTextos = document.createElementNS(ns, 'g');
+
+  const fatiasInfo = [];
 
   opcoes.forEach(item => {
     const fracao = item.votos / TOTAL_PESQUISA;
     if (fracao <= 0) return;
 
     const anguloFatia = fracao * Math.PI * 2;
-    const anguloFim = anguloAtual + anguloFatia;
-
-    const x1 = Math.cos(anguloAtual) * raio;
-    const y1 = Math.sin(anguloAtual) * raio;
-    const x2 = Math.cos(anguloFim) * raio;
-    const y2 = Math.sin(anguloFim) * raio;
-    const arcoGrande = anguloFatia > Math.PI ? 1 : 0;
+    const anguloInicio = anguloAcumulado;
+    const anguloFim = anguloInicio + anguloFatia;
 
     const path = document.createElementNS(ns, 'path');
-    const d = fracao >= 0.9999
-      ? `M 0 -${raio} A ${raio} ${raio} 0 1 1 -0.01 -${raio} Z`
-      : `M 0 0 L ${x1.toFixed(2)} ${y1.toFixed(2)} A ${raio} ${raio} 0 ${arcoGrande} 1 ${x2.toFixed(2)} ${y2.toFixed(2)} Z`;
-
-    path.setAttribute('d', d);
+    path.setAttribute('d', '');
     path.setAttribute('fill', item.cor);
     path.setAttribute('stroke', '#0a0a0f');
     path.setAttribute('stroke-width', '3');
@@ -1200,27 +1222,41 @@ function renderizarGraficoPizza(opcoes) {
     path.addEventListener('mouseenter', somHover);
     grupoFatias.appendChild(path);
 
-    const anguloMeio = anguloAtual + anguloFatia / 2;
+    const anguloMeio = anguloInicio + anguloFatia / 2;
     const raioTexto = fracao < 0.14 ? raio * 0.72 : raio * 0.56;
     const tx = Math.cos(anguloMeio) * raioTexto;
     const ty = Math.sin(anguloMeio) * raioTexto;
-    const porc = formatarPorcentagem(item.votos, TOTAL_PESQUISA);
+
+    const gLabel = document.createElementNS(ns, 'g');
+    gLabel.setAttribute('class', 'grupoLabelFatia');
 
     const txtNome = document.createElementNS(ns, 'text');
     txtNome.setAttribute('x', tx.toFixed(2));
     txtNome.setAttribute('y', (ty - 6).toFixed(2));
     txtNome.setAttribute('class', 'textoFatiaNome');
     txtNome.textContent = item.nome.toUpperCase();
-    grupoTextos.appendChild(txtNome);
+    gLabel.appendChild(txtNome);
 
     const txtPorc = document.createElementNS(ns, 'text');
     txtPorc.setAttribute('x', tx.toFixed(2));
     txtPorc.setAttribute('y', (ty + 13).toFixed(2));
     txtPorc.setAttribute('class', 'textoFatiaPorc');
-    txtPorc.textContent = porc;
-    grupoTextos.appendChild(txtPorc);
+    txtPorc.textContent = '0%';
+    gLabel.appendChild(txtPorc);
 
-    anguloAtual = anguloFim;
+    grupoTextos.appendChild(gLabel);
+
+    fatiasInfo.push({
+      item,
+      fracao,
+      anguloInicio,
+      anguloFim,
+      path,
+      gLabel,
+      txtPorc
+    });
+
+    anguloAcumulado = anguloFim;
   });
 
   svg.appendChild(grupoFatias);
@@ -1231,24 +1267,107 @@ function renderizarGraficoPizza(opcoes) {
   const blocoNumeros = document.createElement('div');
   blocoNumeros.className = 'numerosPesquisa';
 
-  opcoes.forEach(item => {
+  const spansNumeros = [];
+  opcoes.forEach((item, idx) => {
     const linha = document.createElement('div');
     linha.className = 'linhaNumero';
-    linha.innerHTML = `
-      <span class="rotuloOpcao">
-        <span class="corLegenda" style="background:${item.cor}"></span>
-        <span>${item.rotuloNumero || `${item.nome}: ${item.votos} pessoas`}</span>
-      </span>
-    `;
+    linha.style.animationDelay = (0.3 + idx * 0.18) + 's';
+
+    const rotuloOpcao = document.createElement('span');
+    rotuloOpcao.className = 'rotuloOpcao';
+
+    const corEl = document.createElement('span');
+    corEl.className = 'corLegenda';
+    corEl.style.background = item.cor;
+
+    const textoEl = document.createElement('span');
+    const prefixo = item.rotulo || item.nome;
+    textoEl.textContent = `${prefixo}: 0 pessoas`;
+
+    rotuloOpcao.appendChild(corEl);
+    rotuloOpcao.appendChild(textoEl);
+    linha.appendChild(rotuloOpcao);
     blocoNumeros.appendChild(linha);
+
+    spansNumeros.push({ item, prefixo, textoEl });
   });
 
   const totalEl = document.createElement('div');
   totalEl.className = 'totalPesquisa';
-  totalEl.textContent = `Total: ${TOTAL_PESQUISA} pessoas`;
+  totalEl.textContent = `Total: 0 pessoas`;
   blocoNumeros.appendChild(totalEl);
 
   painel.appendChild(blocoNumeros);
+
+  // Animação de abertura radial das fatias + contagem dos números e porcentagens
+  const duracao = 1250;
+  const inicio = performance.now();
+  let ultimoTick = 0;
+
+  function animarFrame(agora) {
+    const t = Math.min(1, (agora - inicio) / duracao);
+    const eased = 1 - Math.pow(1 - t, 3);
+    const anguloVarredura = -Math.PI / 2 + eased * Math.PI * 2;
+
+    if (agora - ultimoTick > 75 && t < 0.96) {
+      somTecla();
+      ultimoTick = agora;
+    }
+
+    fatiasInfo.forEach(f => {
+      if (anguloVarredura <= f.anguloInicio) {
+        f.path.setAttribute('d', '');
+        return;
+      }
+      const fimAtual = Math.min(anguloVarredura, f.anguloFim);
+      const delta = fimAtual - f.anguloInicio;
+      if (delta <= 0.001) {
+        f.path.setAttribute('d', '');
+        return;
+      }
+
+      let d;
+      if (delta >= Math.PI * 2 - 0.001) {
+        d = `M 0 -${raio} A ${raio} ${raio} 0 1 1 -0.01 -${raio} Z`;
+      } else {
+        const x1 = Math.cos(f.anguloInicio) * raio;
+        const y1 = Math.sin(f.anguloInicio) * raio;
+        const x2 = Math.cos(fimAtual) * raio;
+        const y2 = Math.sin(fimAtual) * raio;
+        const arcoGrande = delta > Math.PI ? 1 : 0;
+        d = `M 0 0 L ${x1.toFixed(2)} ${y1.toFixed(2)} A ${raio} ${raio} 0 ${arcoGrande} 1 ${x2.toFixed(2)} ${y2.toFixed(2)} Z`;
+      }
+      f.path.setAttribute('d', d);
+
+      const progFatia = Math.min(1, delta / (f.anguloFim - f.anguloInicio));
+      if (progFatia > 0.25) {
+        f.gLabel.classList.add('visivel');
+      }
+      f.txtPorc.textContent = formatarPorcentagem(f.item.votos * progFatia, TOTAL_PESQUISA);
+    });
+
+    spansNumeros.forEach(s => {
+      const votosAtuais = Math.round(s.item.votos * eased);
+      s.textoEl.textContent = `${s.prefixo}: ${votosAtuais} pessoas`;
+    });
+
+    totalEl.textContent = `Total: ${Math.round(TOTAL_PESQUISA * eased)} pessoas`;
+
+    if (t < 1) {
+      idAnimacaoGrafico = requestAnimationFrame(animarFrame);
+    } else {
+      fatiasInfo.forEach(f => {
+        f.gLabel.classList.add('visivel');
+        f.txtPorc.textContent = formatarPorcentagem(f.item.votos, TOTAL_PESQUISA);
+      });
+      spansNumeros.forEach(s => {
+        s.textoEl.textContent = `${s.prefixo}: ${s.item.votos} pessoas`;
+      });
+      totalEl.textContent = `Total: ${TOTAL_PESQUISA} pessoas`;
+    }
+  }
+
+  idAnimacaoGrafico = requestAnimationFrame(animarFrame);
   return painel;
 }
 
@@ -1257,19 +1376,19 @@ function abrirPergunta(chave) {
   conteudoSecao.innerHTML = '';
   tituloSecao.textContent = titulosPerguntas[chave] || '';
 
-  if (dadosGraficos[chave]) {
-    conteudoSecao.appendChild(renderizarGraficoPizza(dadosGraficos[chave]));
-  } else {
-    const aviso = document.createElement('p');
-    aviso.className = 'avisoEmBreve';
-    aviso.textContent = 'Em breve...';
-    conteudoSecao.appendChild(aviso);
-  }
-
   telaProxima.classList.add('sumir');
   setTimeout(() => {
     telaProxima.classList.remove('aparecer', 'sumir');
     telaSecao.classList.add('aparecer');
+
+    if (dadosGraficos[chave]) {
+      conteudoSecao.appendChild(renderizarGraficoPizza(dadosGraficos[chave]));
+    } else {
+      const aviso = document.createElement('p');
+      aviso.className = 'avisoEmBreve';
+      aviso.textContent = 'Em breve...';
+      conteudoSecao.appendChild(aviso);
+    }
   }, 500);
 }
 
