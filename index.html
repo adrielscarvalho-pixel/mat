@@ -939,6 +939,57 @@
     color: #f2ede4;
     text-shadow: 1px 2px 2px #000;
   }
+  .quadroArea {
+    width: 100%;
+    max-width: 620px;
+    background: rgba(20, 14, 24, 0.86);
+    border: 1px solid rgba(163, 0, 0, 0.55);
+    border-radius: 8px;
+    padding: 20px 18px 16px;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(163, 0, 0, 0.14);
+    animation: surgirQuadroBarras 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+  .svgArea {
+    width: 100%;
+    height: auto;
+    display: block;
+    overflow: visible;
+  }
+  .textoEixoYArea {
+    font-family: 'Cinzel', serif;
+    font-weight: 700;
+    font-size: 13px;
+    fill: #f5e6c8;
+    text-anchor: end;
+    user-select: none;
+  }
+  .nomeEixoArea {
+    font-family: 'Bangers', cursive;
+    font-size: 17px;
+    letter-spacing: 1px;
+    fill: #f2ede4;
+    text-anchor: middle;
+    filter: drop-shadow(1px 2px 2px #000);
+    user-select: none;
+  }
+  .valorPontoArea {
+    font-family: 'Cinzel', serif;
+    font-weight: 900;
+    font-size: 13.5px;
+    fill: #d4a856;
+    text-anchor: middle;
+    filter: drop-shadow(1px 2px 3px #000);
+    pointer-events: none;
+  }
+  .pontoArea {
+    cursor: pointer;
+    transition: r 0.2s ease, filter 0.2s ease;
+    filter: drop-shadow(0 0 6px rgba(0,0,0,0.85));
+  }
+  .pontoArea:hover {
+    r: 9;
+    filter: brightness(1.2) drop-shadow(0 0 10px rgba(255,255,255,0.5));
+  }
   #btnVoltar {
     margin-top: 36px;
     font-size: clamp(1rem, 2.2vw, 1.4rem);
@@ -1439,6 +1490,16 @@ const dadosGraficos = {
       { nome: 'Thanos',     rotulo: 'Thanos',     votos: 33, cor: '#7b2cbf' },
       { nome: 'Magneto',    rotulo: 'Magneto',    votos: 16, cor: '#b31217' }
     ]
+  },
+  p4: {
+    tipo: 'area',
+    passoEscala: 10,
+    maxEscala: 60,
+    opcoes: [
+      { nome: 'Tobey Maguire',   rotulo: 'Tobey Maguire',   votos: 57, cor: '#b31217' },
+      { nome: 'Andrew Garfield', rotulo: 'Andrew Garfield', votos: 28, cor: '#1e4db7' },
+      { nome: 'Tom Holland',     rotulo: 'Tom Holland',     votos: 23, cor: '#d4a856' }
+    ]
   }
 };
 
@@ -1910,6 +1971,231 @@ function renderizarGraficoBarrasVertical(config) {
   return painel;
 }
 
+function renderizarGraficoArea(config) {
+  if (idAnimacaoGrafico) cancelAnimationFrame(idAnimacaoGrafico);
+
+  const opcoes = config.opcoes;
+  const passo = config.passoEscala || 10;
+  const maiorVoto = Math.max(...opcoes.map(o => o.votos));
+  const maxEscala = config.maxEscala || (Math.ceil(maiorVoto / passo) * passo);
+
+  const painel = document.createElement('div');
+  painel.className = 'painelGrafico';
+
+  const quadro = document.createElement('div');
+  quadro.className = 'quadroArea';
+
+  const ns = 'http://www.w3.org/2000/svg';
+  const svg = document.createElementNS(ns, 'svg');
+  svg.setAttribute('viewBox', '0 0 560 305');
+  svg.setAttribute('class', 'svgArea');
+
+  const defs = document.createElementNS(ns, 'defs');
+  const grad = document.createElementNS(ns, 'linearGradient');
+  grad.setAttribute('id', 'gradAreaHerói');
+  grad.setAttribute('x1', '0%');
+  grad.setAttribute('y1', '0%');
+  grad.setAttribute('x2', '0%');
+  grad.setAttribute('y2', '100%');
+
+  const stop1 = document.createElementNS(ns, 'stop');
+  stop1.setAttribute('offset', '0%');
+  stop1.setAttribute('stop-color', '#b31217');
+  stop1.setAttribute('stop-opacity', '0.78');
+
+  const stop2 = document.createElementNS(ns, 'stop');
+  stop2.setAttribute('offset', '58%');
+  stop2.setAttribute('stop-color', '#1e4db7');
+  stop2.setAttribute('stop-opacity', '0.45');
+
+  const stop3 = document.createElementNS(ns, 'stop');
+  stop3.setAttribute('offset', '100%');
+  stop3.setAttribute('stop-color', '#0a0a0f');
+  stop3.setAttribute('stop-opacity', '0.08');
+
+  grad.appendChild(stop1);
+  grad.appendChild(stop2);
+  grad.appendChild(stop3);
+  defs.appendChild(grad);
+  svg.appendChild(defs);
+
+  const xEixoY = 48;
+  const xFimEixo = 528;
+  const yTopo = 38;
+  const yBase = 248;
+  const alturaPlot = yBase - yTopo;
+  const xInicioPontos = 112;
+  const xFimPontos = 464;
+
+  const grupoGrade = document.createElementNS(ns, 'g');
+
+  // Escala vertical de 10 em 10
+  for (let v = 0; v <= maxEscala; v += passo) {
+    const y = yBase - (v / maxEscala) * alturaPlot;
+
+    const linhaH = document.createElementNS(ns, 'line');
+    linhaH.setAttribute('x1', xEixoY);
+    linhaH.setAttribute('y1', y.toFixed(2));
+    linhaH.setAttribute('x2', xFimEixo);
+    linhaH.setAttribute('y2', y.toFixed(2));
+    linhaH.setAttribute('stroke', v === 0 ? 'rgba(212,168,86,0.75)' : 'rgba(212,168,86,0.22)');
+    linhaH.setAttribute('stroke-width', v === 0 ? '2' : '1');
+    if (v > 0) linhaH.setAttribute('stroke-dasharray', '4 4');
+    grupoGrade.appendChild(linhaH);
+
+    const txtY = document.createElementNS(ns, 'text');
+    txtY.setAttribute('x', xEixoY - 10);
+    txtY.setAttribute('y', (y + 4).toFixed(2));
+    txtY.setAttribute('class', 'textoEixoYArea');
+    txtY.textContent = v;
+    grupoGrade.appendChild(txtY);
+  }
+
+  // Eixo Y vertical
+  const linhaEixoY = document.createElementNS(ns, 'line');
+  linhaEixoY.setAttribute('x1', xEixoY);
+  linhaEixoY.setAttribute('y1', yTopo);
+  linhaEixoY.setAttribute('x2', xEixoY);
+  linhaEixoY.setAttribute('y2', yBase);
+  linhaEixoY.setAttribute('stroke', 'rgba(212,168,86,0.75)');
+  linhaEixoY.setAttribute('stroke-width', '2');
+  grupoGrade.appendChild(linhaEixoY);
+
+  svg.appendChild(grupoGrade);
+
+  const pathArea = document.createElementNS(ns, 'path');
+  pathArea.setAttribute('fill', 'url(#gradAreaHerói)');
+  pathArea.setAttribute('d', '');
+  svg.appendChild(pathArea);
+
+  const pathLinha = document.createElementNS(ns, 'path');
+  pathLinha.setAttribute('fill', 'none');
+  pathLinha.setAttribute('stroke', '#e53935');
+  pathLinha.setAttribute('stroke-width', '3.5');
+  pathLinha.setAttribute('stroke-linejoin', 'round');
+  pathLinha.setAttribute('stroke-linecap', 'round');
+  pathLinha.setAttribute('d', '');
+  svg.appendChild(pathLinha);
+
+  const grupoGuias = document.createElementNS(ns, 'g');
+  const grupoPontos = document.createElementNS(ns, 'g');
+  svg.appendChild(grupoGuias);
+  svg.appendChild(grupoPontos);
+
+  const pontosInfo = [];
+  const totalOpcoes = opcoes.length;
+
+  opcoes.forEach((item, i) => {
+    const x = totalOpcoes === 1
+      ? (xInicioPontos + xFimPontos) / 2
+      : xInicioPontos + (i / (totalOpcoes - 1)) * (xFimPontos - xInicioPontos);
+
+    const guiaV = document.createElementNS(ns, 'line');
+    guiaV.setAttribute('x1', x.toFixed(2));
+    guiaV.setAttribute('y1', yBase);
+    guiaV.setAttribute('x2', x.toFixed(2));
+    guiaV.setAttribute('y2', yBase);
+    guiaV.setAttribute('stroke', 'rgba(255,255,255,0.22)');
+    guiaV.setAttribute('stroke-width', '1.5');
+    guiaV.setAttribute('stroke-dasharray', '3 3');
+    grupoGuias.appendChild(guiaV);
+
+    const circulo = document.createElementNS(ns, 'circle');
+    circulo.setAttribute('cx', x.toFixed(2));
+    circulo.setAttribute('cy', yBase);
+    circulo.setAttribute('r', '7');
+    circulo.setAttribute('fill', item.cor);
+    circulo.setAttribute('stroke', '#ffffff');
+    circulo.setAttribute('stroke-width', '2.5');
+    circulo.setAttribute('class', 'pontoArea');
+    circulo.addEventListener('mouseenter', somHover);
+    grupoPontos.appendChild(circulo);
+
+    const txtValor = document.createElementNS(ns, 'text');
+    txtValor.setAttribute('x', x.toFixed(2));
+    txtValor.setAttribute('y', yBase - 14);
+    txtValor.setAttribute('class', 'valorPontoArea');
+    txtValor.textContent = '0 (0%)';
+    grupoPontos.appendChild(txtValor);
+
+    const txtNome = document.createElementNS(ns, 'text');
+    txtNome.setAttribute('x', x.toFixed(2));
+    txtNome.setAttribute('y', yBase + 32);
+    txtNome.setAttribute('class', 'nomeEixoArea');
+    txtNome.textContent = item.nome;
+    grupoPontos.appendChild(txtNome);
+
+    pontosInfo.push({ item, x, guiaV, circulo, txtValor });
+  });
+
+  quadro.appendChild(svg);
+  painel.appendChild(quadro);
+
+  const { blocoNumeros, spansNumeros, totalEl } = criarBlocoNumeros(opcoes);
+  painel.appendChild(blocoNumeros);
+
+  const duracao = 1250;
+  const inicio = performance.now();
+  let ultimoTick = 0;
+
+  function animarArea(agora) {
+    const t = Math.min(1, (agora - inicio) / duracao);
+    const eased = 1 - Math.pow(1 - t, 3);
+
+    if (agora - ultimoTick > 75 && t < 0.96) {
+      somTecla();
+      ultimoTick = agora;
+    }
+
+    const coords = pontosInfo.map(p => {
+      const votosAtuais = p.item.votos * eased;
+      const y = yBase - Math.min(1, votosAtuais / maxEscala) * alturaPlot;
+      p.guiaV.setAttribute('y2', y.toFixed(2));
+      p.circulo.setAttribute('cy', y.toFixed(2));
+      p.txtValor.setAttribute('y', (y - 14).toFixed(2));
+      p.txtValor.textContent = `${Math.round(votosAtuais)} (${formatarPorcentagem(votosAtuais, TOTAL_PESQUISA)})`;
+      return { x: p.x, y };
+    });
+
+    if (coords.length > 0) {
+      const primeiro = coords[0];
+      const ultimo = coords[coords.length - 1];
+      const dLinha = coords.map((c, idx) => `${idx === 0 ? 'M' : 'L'} ${c.x.toFixed(2)} ${c.y.toFixed(2)}`).join(' ');
+      const dArea = `M ${primeiro.x.toFixed(2)} ${yBase} ` +
+        coords.map(c => `L ${c.x.toFixed(2)} ${c.y.toFixed(2)}`).join(' ') +
+        ` L ${ultimo.x.toFixed(2)} ${yBase} Z`;
+      pathLinha.setAttribute('d', dLinha);
+      pathArea.setAttribute('d', dArea);
+    }
+
+    spansNumeros.forEach(s => {
+      const votosAtuais = Math.round(s.item.votos * eased);
+      s.textoEl.textContent = `${s.prefixo}: ${votosAtuais} pessoas`;
+    });
+
+    totalEl.textContent = `Total: ${Math.round(TOTAL_PESQUISA * eased)} pessoas`;
+
+    if (t < 1) {
+      idAnimacaoGrafico = requestAnimationFrame(animarArea);
+    } else {
+      pontosInfo.forEach(p => {
+        const y = yBase - Math.min(1, p.item.votos / maxEscala) * alturaPlot;
+        p.guiaV.setAttribute('y2', y.toFixed(2));
+        p.circulo.setAttribute('cy', y.toFixed(2));
+        p.txtValor.setAttribute('y', (y - 14).toFixed(2));
+        p.txtValor.textContent = `${p.item.votos} (${formatarPorcentagem(p.item.votos, TOTAL_PESQUISA)})`;
+      });
+      spansNumeros.forEach(s => {
+        s.textoEl.textContent = `${s.prefixo}: ${s.item.votos} pessoas`;
+      });
+      totalEl.textContent = `Total: ${TOTAL_PESQUISA} pessoas`;
+    }
+  }
+
+  idAnimacaoGrafico = requestAnimationFrame(animarArea);
+  return painel;
+}
+
 // ==================== ABERTURA DE CADA PERGUNTA ====================
 function exibirSecaoPergunta(chave) {
   conteudoSecao.innerHTML = '';
@@ -1922,6 +2208,8 @@ function exibirSecaoPergunta(chave) {
       conteudoSecao.appendChild(renderizarGraficoBarrasHorizontal(cfg));
     } else if (cfg.tipo === 'barras_vertical') {
       conteudoSecao.appendChild(renderizarGraficoBarrasVertical(cfg));
+    } else if (cfg.tipo === 'area') {
+      conteudoSecao.appendChild(renderizarGraficoArea(cfg));
     } else {
       conteudoSecao.appendChild(renderizarGraficoPizza(cfg.opcoes));
     }
