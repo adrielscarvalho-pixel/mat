@@ -414,10 +414,73 @@
     animation: slamDiagonal 0.55s cubic-bezier(0.15, 0.9, 0.3, 1.4) forwards;
   }
 
-  /* ============ PRÓXIMA PÁGINA (AO CLICAR EM INICIAR) ============ */
-  #telaProxima {
+  /* ============ TELA 3: HISTÓRIA (texto digitando) ============ */
+  #telaHistoria {
     background: radial-gradient(ellipse at center, #16121c 0%, #0a0a0f 75%);
     z-index: 20;
+    display: none;
+    opacity: 0;
+  }
+  #telaHistoria.aparecer {
+    display: flex;
+    animation: surgir 1s ease forwards;
+  }
+  #textoHistoria {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 22px;
+    text-align: center;
+    max-width: 900px;
+    padding: 0 24px;
+    min-height: 180px;
+    justify-content: center;
+  }
+  .linhaNormal {
+    font-family: 'Cinzel', serif;
+    font-weight: 700;
+    color: #e8e6e3;
+    font-size: clamp(1.2rem, 3vw, 2rem);
+    text-shadow: 2px 2px 3px #000;
+  }
+  .linhaDestaque {
+    font-family: 'Pirata One', cursive;
+    color: #a30000;
+    font-size: clamp(1.9rem, 5.5vw, 3.8rem);
+    text-shadow: 0 0 20px rgba(163,0,0,0.6), 2px 2px 2px #000;
+  }
+  .linhaNomes {
+    font-family: 'Bangers', cursive;
+    color: #d4a856;
+    font-size: clamp(1.5rem, 4vw, 2.7rem);
+    letter-spacing: 3px;
+    text-shadow: 2px 2px 0 #000;
+  }
+  /* cursor piscando enquanto digita */
+  .digitando::after {
+    content: '▌';
+    color: #a30000;
+    animation: piscarCursor 0.8s steps(1) infinite;
+  }
+  @keyframes piscarCursor { 50% { opacity: 0; } }
+  #btnAvancar {
+    margin-top: 55px;
+    font-size: clamp(1rem, 2.2vw, 1.4rem);
+    padding: 12px 45px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s ease;
+  }
+  #btnAvancar.visivel {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  #telaHistoria.sumir { animation: desvanecer 0.8s ease forwards; }
+
+  /* ============ PRÓXIMA PÁGINA (CAPÍTULOS / PERGUNTAS) ============ */
+  #telaProxima {
+    background: radial-gradient(ellipse at center, #16121c 0%, #0a0a0f 75%);
+    z-index: 15;
     display: none;
     opacity: 0;
     gap: 32px;
@@ -450,6 +513,8 @@
   .modoCelular .livro { width: 18px; }
   .modoCelular .botaoEscolha { width: min(320px, 86vw); padding: 16px 10px; font-size: 1.05rem; }
   .modoCelular #botoes .botao { padding: 15px 60px; }
+  .modoCelular #textoHistoria { padding: 0 18px; gap: 16px; }
+  .modoCelular #btnAvancar { margin-top: 38px; }
   .modoCelular .pena { font-size: 20px; }
   .modoCelular .botaoInicio { padding: 10px 24px; letter-spacing: 2px; }
   .modoCelular #perguntaDispositivo { font-size: clamp(1.2rem, 6vw, 1.8rem); }
@@ -500,7 +565,13 @@
     <p id="dicaSplash2">CLIQUE PARA CONTINUAR</p>
   </div>
 
-  <!-- TELA PRÓXIMA (outra página que já vamos fazer) -->
+  <!-- TELA 3: história com texto digitando -->
+  <div class="tela" id="telaHistoria">
+    <div id="textoHistoria"></div>
+    <button class="botao" id="btnAvancar">TOQUE PARA AVANÇAR</button>
+  </div>
+
+  <!-- TELA PRÓXIMA (perguntas / gráficos que vamos montar) -->
   <div class="tela" id="telaProxima">
     <h1 id="tituloProxima">Super heroi</h1>
     <p class="avisoEmBreve">Em breve...</p>
@@ -590,6 +661,21 @@ function somClique() {
   osc.connect(ganho).connect(ctxAudio.destination);
   osc.start(agora);
   osc.stop(agora + 0.15);
+}
+
+// tec-tec de máquina de escrever (bem baixinho)
+function somTecla() {
+  if (!ctxAudio) return;
+  const agora = ctxAudio.currentTime;
+  const osc = ctxAudio.createOscillator();
+  osc.type = 'triangle';
+  osc.frequency.value = 1000 + Math.random() * 600;
+  const ganho = ctxAudio.createGain();
+  ganho.gain.setValueAtTime(0.04, agora);
+  ganho.gain.exponentialRampToValueAtTime(0.001, agora + 0.04);
+  osc.connect(ganho).connect(ctxAudio.destination);
+  osc.start(agora);
+  osc.stop(agora + 0.05);
 }
 
 // tique sutil ao passar o mouse
@@ -713,6 +799,75 @@ const tituloSplash2 = document.getElementById('tituloSplash2');
 const dicaSplash2 = document.getElementById('dicaSplash2');
 const telaProxima = document.getElementById('telaProxima');
 const btnVoltarInicio = document.getElementById('btnVoltarInicio');
+const telaHistoria = document.getElementById('telaHistoria');
+const textoHistoria = document.getElementById('textoHistoria');
+const btnAvancar = document.getElementById('btnAvancar');
+
+// As páginas de texto após clicar em INICIAR
+const paginasHistoria = [
+  [
+    { texto: 'Fizemos 5 perguntas sobre super heroi para varias pessoas', classe: 'linhaNormal' }
+  ],
+  [
+    { texto: 'Fizemos graficos para cada pergunta.', classe: 'linhaNormal' }
+  ],
+  [
+    { texto: 'espero que gostem.', classe: 'linhaNormal' }
+  ]
+];
+
+let paginaAtual = 0;
+let geracaoHistoria = 0;
+let paginasAtuais = paginasHistoria;
+let cliqueNoFim = false;
+let aoTerminarPaginas = () => {
+  telaHistoria.classList.add('sumir');
+  telaProxima.classList.remove('sumir');
+  telaProxima.classList.add('aparecer');
+};
+
+const esperar = ms => new Promise(r => setTimeout(r, ms));
+
+// escreve o texto letra por letra, como se alguém digitasse
+function digitarLinha(el, texto, velocidade = 55) {
+  return new Promise(resolve => {
+    el.classList.add('digitando');
+    let i = 0;
+    const intervalo = setInterval(() => {
+      i++;
+      el.textContent = texto.slice(0, i);
+      if (i % 2 === 0) somTecla();
+      if (i >= texto.length) {
+        clearInterval(intervalo);
+        el.classList.remove('digitando');
+        resolve();
+      }
+    }, velocidade);
+  });
+}
+
+async function mostrarPagina(n) {
+  if (n >= paginasAtuais.length) return;
+  const geracao = ++geracaoHistoria;
+  textoHistoria.innerHTML = '';
+  btnAvancar.classList.remove('visivel');
+  for (const linha of paginasAtuais[n]) {
+    if (geracao !== geracaoHistoria) return;
+    const el = document.createElement('div');
+    el.className = linha.classe;
+    textoHistoria.appendChild(el);
+    await digitarLinha(el, linha.texto);
+    await esperar(400);
+  }
+  if (geracao !== geracaoHistoria) return;
+  if (n < paginasAtuais.length - 1 || cliqueNoFim) {
+    btnAvancar.classList.add('visivel');
+  } else {
+    await esperar(1600);
+    if (geracao !== geracaoHistoria) return;
+    aoTerminarPaginas();
+  }
+}
 
 telaToque.addEventListener('click', () => {
   iniciarAudio();
@@ -759,8 +914,9 @@ function mostrarSplash2() {
     telaSplash2.addEventListener('click', () => {
       somClique();
       telaSplash2.classList.add('sair');
-      telaProxima.classList.remove('sumir');
-      telaProxima.classList.add('aparecer');
+      telaHistoria.classList.remove('sumir');
+      telaHistoria.classList.add('aparecer');
+      mostrarPagina(0);
     }, { once: true });
   }, 1300);
 }
@@ -771,12 +927,20 @@ const btnSair = document.getElementById('btnSair');
 const telaSair = document.getElementById('telaSair');
 const tituloSair = document.getElementById('tituloSair');
 
-[btnIniciar, btnSair, btnVoltarInicio].forEach(b => {
+[btnIniciar, btnSair, btnVoltarInicio, btnAvancar].forEach(b => {
   b.addEventListener('mouseenter', somHover);
 });
 
 btnIniciar.addEventListener('click', () => {
   somClique();
+  paginasAtuais = paginasHistoria;
+  cliqueNoFim = false;
+  paginaAtual = 0;
+  aoTerminarPaginas = () => {
+    telaHistoria.classList.add('sumir');
+    telaProxima.classList.remove('sumir');
+    telaProxima.classList.add('aparecer');
+  };
   telaMenu.classList.add('sumir');
   setTimeout(() => {
     telaMenu.style.display = 'none';
@@ -784,17 +948,35 @@ btnIniciar.addEventListener('click', () => {
   }, 800);
 });
 
+btnAvancar.addEventListener('click', () => {
+  if (!btnAvancar.classList.contains('visivel')) return;
+  somClique();
+  paginaAtual++;
+  if (paginaAtual >= paginasAtuais.length) {
+    btnAvancar.classList.remove('visivel');
+    aoTerminarPaginas();
+    return;
+  }
+  mostrarPagina(paginaAtual);
+});
+
 btnVoltarInicio.addEventListener('click', () => {
   somClique();
-  telaProxima.classList.add('sumir');
-  setTimeout(() => {
-    telaProxima.classList.remove('aparecer', 'sumir');
-    telaSplash2.classList.remove('tremer', 'sair');
-    telaSplash2.style.display = 'none';
-    telaMenu.style.display = '';
-    telaMenu.classList.remove('sumir');
-    telaMenu.classList.add('aparecer');
-  }, 500);
+  geracaoHistoria++;
+  [telaProxima, telaHistoria, telaSplash2].forEach(tela => {
+    tela.classList.remove('aparecer', 'sumir', 'tremer', 'sair');
+    tela.style.display = '';
+    tela.style.opacity = '';
+  });
+  dicaSplash2.classList.remove('mostrar');
+  tituloSplash2.classList.remove('entrar');
+  textoHistoria.innerHTML = '';
+  btnAvancar.classList.remove('visivel');
+  paginaAtual = 0;
+  telaMenu.style.display = '';
+  telaMenu.style.opacity = '';
+  telaMenu.classList.remove('sumir');
+  telaMenu.classList.add('aparecer');
 });
 
 // Ao clicar em SAIR: aparece por 5 segundos "OS PRIMOS NÂO DEIXARÃO!"
